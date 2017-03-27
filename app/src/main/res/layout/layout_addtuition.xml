@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+<ScrollView
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+<LinearLayout
+    android:id="@+id/tab1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/etSubject"
+        android:layout_width="371dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Subject"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/etTutorName"
+        android:layout_width="371dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Tutor's Name"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/etTutorACNumber"
+        android:layout_width="371dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Tutor's AC Number"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/etFee"
+        android:layout_width="371dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Fee"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/etVenue"
+        android:layout_width="371dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Venue"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:id="@+id/txtSelectDays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Days"
+        android:textSize="18sp" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txtMon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="MON"
+            android:layout_weight="1"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/txtTue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="TUE"
+            android:layout_weight="1"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/txtWed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="WED"
+            android:layout_weight="1"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/txtThu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="THU"
+            android:layout_weight="1"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/txtFri"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="FRI"
+            android:layout_weight="1"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/txtSat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="SAT"
+            android:layout_weight="1"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/txtSun"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="SUN"
+            android:layout_weight="1"
+            android:textSize="16sp" />
+    </LinearLayout>>
+
+</LinearLayout>
+</ScrollView>
+</LinearLayout>
