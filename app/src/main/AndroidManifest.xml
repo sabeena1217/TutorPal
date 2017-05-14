@@ -18,7 +18,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".views.AddChild"></activity>
+        <activity android:name=".views.AddChild" />
+        <activity android:name=".views.ViewChild" />
+
+        <receiver
+            android:name=".Presenter.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <service android:name=".Presenter.RingtonePlayingService" />
+
+        <activity android:name=".views.NotifyTuition"></activity>
     </application>
 
 </manifest>

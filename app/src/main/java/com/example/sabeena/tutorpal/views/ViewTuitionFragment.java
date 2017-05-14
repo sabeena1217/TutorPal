@@ -1,15 +1,12 @@
 package com.example.sabeena.tutorpal.views;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
-
-import android.content.Intent;
-import android.media.Ringtone;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,47 +14,46 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-
-import com.example.sabeena.tutorpal.Presenter.AlarmReceiver;
-import com.example.sabeena.tutorpal.Presenter.RingtonePlayingService;
+import com.example.sabeena.tutorpal.Presenter.DatabaseHandler;
 import com.example.sabeena.tutorpal.R;
 import com.example.sabeena.tutorpal.models.Day;
 import com.example.sabeena.tutorpal.models.TuitionClass;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class AddTuitionFragment extends Fragment {
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link ViewTuitionFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link ViewTuitionFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class ViewTuitionFragment extends Fragment {
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
-    static final int DIALOG_ID = 0;
-    int hour_x;
-    int minute_x;
     EditText etStartTime;
     EditText etEndTime;
     private static final String ARG_PARAM1 = "param1";
     private int mParam1;//last childID
-    private Switch tuitionSwitch;
-
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
 
+
     private OnFragmentInteractionListener mListener;
 
-    public AddTuitionFragment() {
+    public ViewTuitionFragment() {
         // Required empty public constructor
     }
 
 
     // TODO: Rename and change types and number of parameters
-    public static AddTuitionFragment newInstance(int param1) {
-        AddTuitionFragment fragment = new AddTuitionFragment();
+    public static ViewTuitionFragment newInstance(int param1) {
+        ViewTuitionFragment fragment = new ViewTuitionFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, param1);
         fragment.setArguments(args);
@@ -72,8 +68,7 @@ public class AddTuitionFragment extends Fragment {
         }
     }
 
-    public Calendar showStartTimePickerDialog() {
-        final Calendar calendar = Calendar.getInstance();
+    public void showStartTimePickerDialog() {
         etStartTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,8 +84,6 @@ public class AddTuitionFragment extends Fragment {
                         String am_pm = "";
                         am_pm = (selectedHour < 12) ? "AM" : "PM";//12 hour clk
                         etStartTime.setText(selectedHour + ":" + selectedMinute);
-                        calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
-                        calendar.set(Calendar.MINUTE, selectedMinute);
                     }
                 }, hour, minute, true);//Yes 12 hour time
                 mTimePicker.setTitle("Select Start Time");
@@ -99,11 +92,9 @@ public class AddTuitionFragment extends Fragment {
 
             }
         });
-        return calendar;
     }
 
-    public Calendar showEndTimePickerDialog() {
-        final Calendar calendar = Calendar.getInstance();
+    public void showEndTimePickerDialog() {
         etEndTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,43 +115,23 @@ public class AddTuitionFragment extends Fragment {
                         //SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
                         //String DateTime = sdf.format(selectedHour);
                         //datetime.set(Calendar.HOUR_OF_DAY,selectedHour);
-
                         etEndTime.setText(selectedHour + ":" + selectedMinute);
-                        calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
-                        calendar.set(Calendar.MINUTE, selectedMinute);
                     }
                 }, hour, minute, true);//Yes 12 hour time
                 mTimePicker.setTitle("Select End Time");
                 //mTimePicker.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
                 mTimePicker.show();
+
             }
         });
-        return calendar;
     }
 
-    // private void scheduleAlarm(int dayOfWeek, int hourOfDay, int minute) {
-
-    //@Override
-    //protected Dialog onCreateDialog(int id){
-    //  if(id == DIALOG_ID)
-    //    return new TimePickerDialog(getActivity(),kTimePickerListener,hour_x,minute_x,false);
-    //return null;
-    //}
-
-    protected TimePickerDialog.OnTimeSetListener kTimePickerListener = new TimePickerDialog.OnTimeSetListener() {
-        @Override
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            hour_x = hourOfDay;
-            minute_x = minute;
-            Toast.makeText(getActivity(), hour_x + " : " + minute_x, Toast.LENGTH_LONG).show();
-
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_tuition, container, false);
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_view_tuition, container, false);
 
         final Spinner days_spinner = (Spinner) view.findViewById(R.id.spinnerDay);
 
@@ -169,8 +140,11 @@ public class AddTuitionFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         days_spinner.setAdapter(adapter);
 
-        //tuitionSwitch = (Switch) view.findViewById(R.id.switchTuition);
-        //tuitionSwitch.setOnCheckedChangeListener(this);
+        etStartTime = (EditText) view.findViewById(R.id.etStartTime);
+        showStartTimePickerDialog();
+
+        etEndTime = (EditText) view.findViewById(R.id.etEndTime);
+        showEndTimePickerDialog();
 
         //Button btnAdd = (Button) view.findViewById(R.id.btnAdd);
         //btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -183,7 +157,7 @@ public class AddTuitionFragment extends Fragment {
         //}
         //);
         //Button btnCancel = (Button) view.findViewById(R.id.btnCancel);
-        final Integer lastChildID = mParam1;
+        final Integer tuitionID = mParam1;
 
         final EditText etSubject = (EditText) view.findViewById(R.id.etSubject);
         final EditText etTutorName = (EditText) view.findViewById(R.id.etTutorName);
@@ -191,12 +165,56 @@ public class AddTuitionFragment extends Fragment {
         final EditText etFee = (EditText) view.findViewById(R.id.etFee);
         final EditText etVenue = (EditText) view.findViewById(R.id.etVenue);
 
-        etStartTime = (EditText) view.findViewById(R.id.etStartTime);
-        final Calendar startTime = showStartTimePickerDialog();
 
-        etEndTime = (EditText) view.findViewById(R.id.etEndTime);
-        final Calendar endTime = showEndTimePickerDialog();
+        etSubject.setFocusable(false);
+        etTutorName.setFocusable(false);
+        etTutorACNumber.setFocusable(false);
+        etFee.setFocusable(false);
+        etVenue.setFocusable(false);
 
+        DatabaseHandler tutorPalDB = new DatabaseHandler(this.getActivity());
+        SQLiteDatabase db = tutorPalDB.getReadableDatabase();
+
+        Cursor tuition = tutorPalDB.getTuition(db, tuitionID);
+        tuition.moveToFirst();
+        etSubject.setText(tuition.getString(2));
+        etTutorName.setText(tuition.getString(3));
+        etTutorACNumber.setText(tuition.getString(4));
+        etVenue.setText(tuition.getString(5));
+        etFee.setText(Double.toString(tuition.getDouble(6)));
+
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.days_array, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        days_spinner.setAdapter(spinnerAdapter);
+
+
+        Cursor tuitionDays = tutorPalDB.getTuitionDay(db, tuition.getInt(0));
+        tuitionDays.moveToFirst();
+        if (tuitionDays.getCount() != 0) {
+
+            if (tuitionDays.getString(2).equals("Monday"))
+                days_spinner.setSelection(0);
+            else if (tuitionDays.getString(2).equals("Tuesday"))
+                days_spinner.setSelection(1);
+            else if (tuitionDays.getString(2).equals("Wednesday"))
+                days_spinner.setSelection(2);
+            else if (tuitionDays.getString(2).equals("Thursday"))
+                days_spinner.setSelection(3);
+            else if (tuitionDays.getString(2).equals("Friday"))
+                days_spinner.setSelection(4);
+            else if (tuitionDays.getString(2).equals("Saturday"))
+                days_spinner.setSelection(5);
+            else if (tuitionDays.getString(2).equals("Sunday"))
+                days_spinner.setSelection(6);
+
+
+            etStartTime = (EditText) view.findViewById(R.id.etStartTime);
+            etStartTime.setText(tuitionDays.getString(3));
+
+            etEndTime = (EditText) view.findViewById(R.id.etEndTime);
+            etEndTime.setText(tuitionDays.getString(4));
+        }
+/*
         Button btnOK = (Button) view.findViewById(R.id.btnOK);
         btnOK.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,64 +229,39 @@ public class AddTuitionFragment extends Fragment {
                         tuition.setTutorACNumber(etTutorACNumber.getText().toString());
                     }
                     tuition.setTuitionFee(Double.parseDouble(etFee.getText().toString()));
-                    tuition.setLocation(etVenue.getText().toString());
+                    tuition.setLocation(etSubject.getText().toString());
 
-                    int dayOfWeek = 0;
                     Day.DayOfTheWeek selectedDay = Day.DayOfTheWeek.MONDAY;
-                    if (days_spinner.getSelectedItem().toString().equals("Monday")) {
+                    if (days_spinner.getSelectedItem().toString() == "Monday")
                         selectedDay = Day.DayOfTheWeek.MONDAY;
-                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                    } else if (days_spinner.getSelectedItem().toString().equals("Tuesday")) {
+                    else if (days_spinner.getSelectedItem().toString() == "Tuesday")
                         selectedDay = Day.DayOfTheWeek.TUESDAY;
-                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-                    } else if (days_spinner.getSelectedItem().toString().equals("Wednesday")) {
+                    else if (days_spinner.getSelectedItem().toString() == "Wednesday")
                         selectedDay = Day.DayOfTheWeek.WEDNESDAY;
-                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-                    } else if (days_spinner.getSelectedItem().toString().equals("Thursday")) {
+                    else if (days_spinner.getSelectedItem().toString() == "Thurssday")
                         selectedDay = Day.DayOfTheWeek.THURSDAY;
-                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-                    } else if (days_spinner.getSelectedItem().toString().equals("Friday")) {
+                    else if (days_spinner.getSelectedItem().toString() == "Friday")
                         selectedDay = Day.DayOfTheWeek.FRIDAY;
-                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-                    } else if (days_spinner.getSelectedItem().toString().equals("Saturday")) {
+                    else if (days_spinner.getSelectedItem().toString() == "Saturday")
                         selectedDay = Day.DayOfTheWeek.SATURDAY;
-                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                    } else if (days_spinner.getSelectedItem().toString().equals("Sunday")) {
+                    else if (days_spinner.getSelectedItem().toString() == "Sunday")
                         selectedDay = Day.DayOfTheWeek.SUNDAY;
-                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                    }
                     //days_spinner.getSelectedItem().toString(),etStartTime.getText().toString(),etEndTime.getText().toString()
                     tuition.setDay(new Day(selectedDay, etStartTime.getText().toString(), etEndTime.getText().toString()));
 
-                    //SimpleDateFormat dfH = new SimpleDateFormat("HH");
-                    //SimpleDateFormat dfM = new SimpleDateFormat("mm");
-                    tuition.setStartTime(startTime);
-                    tuition.setEndTime(endTime);
-                    //String st = dfM.format(startTime.getTime());
-                    //scheduleAlarm(startTime, lastChildID + 1, );
-                    //scheduleAlarm(endTime);
-                    //Toast.makeText(getActivity(), "start time " + startTime.getTime(), Toast.LENGTH_LONG).show();
-                    onButtonPressed(tuition);
                 }
 
             }
-        });
+        });*/
 
 
         return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(TuitionClass tuition) {
+    public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(tuition);
+            mListener.onFragmentInteraction(uri);
         }
     }
 
@@ -289,13 +282,6 @@ public class AddTuitionFragment extends Fragment {
         mListener = null;
     }
 
-   /* @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-        } else {
-        }
-    }*/
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -308,6 +294,6 @@ public class AddTuitionFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(TuitionClass uri);
+        void onFragmentInteraction(Uri uri);
     }
 }

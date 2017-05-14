@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_add_child"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.sabeena.tutorpal.views.AddChild">
+    tools:context="com.example.sabeena.tutorpal.views.ViewChild">
+
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -16,7 +17,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginTop="10dp">
 
         <LinearLayout
 
@@ -34,16 +36,33 @@
                 android:layout_weight="2"
                 android:orientation="vertical">
 
+                <LinearLayout
 
-                <EditText
-                    android:id="@+id/etName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:ems="10"
-                    android:hint="Child Name"
-                    android:inputType="textPersonName" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Name : "
+                        android:textAlignment="textEnd"
+                        android:textSize="18sp" />
+                    <TextView
+                        android:id="@+id/nameTxt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:layout_weight="2"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:ems="10"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <RadioGroup
                     android:id="@+id/radioBtnGrp"
@@ -52,7 +71,10 @@
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/etName"
                     android:orientation="horizontal">
-
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"/>
                     <RadioButton
                         android:id="@+id/radioBtnMale"
                         android:layout_width="wrap_content"
@@ -85,56 +107,8 @@
 
             </LinearLayout>
         </LinearLayout>
-<!--
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:orientation="horizontal">
 
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="Number Of Classes:"
-
-                android:textAlignment="textEnd"
-                android:textSize="18sp" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.4" />
-
-            <EditText
-                android:id="@+id/etNoOfClasses"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:ems="10"
-                android:inputType="number"
-                android:text="" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.4" />
-
-            <Button
-                android:id="@+id/btnGo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Go" />
-
-
-        </LinearLayout>
-        -->
     </LinearLayout>
-
     <RelativeLayout
         android:id="@+id/fragment_placer"
         android:layout_width="match_parent"
@@ -147,8 +121,6 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-
             android:background="?attr/colorPrimary"
             android:elevation="6dp"
             android:minHeight="?attr/actionBarSize"
@@ -170,27 +142,4 @@
 
     </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/fragment_placer"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnDecline"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableStart="@drawable/ic_decline_child"
-            android:text="Discard" />
-
-        <Button
-            android:id="@+id/btnDone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableStart="@drawable/ic_done_child"
-            android:text="Done" />
-
-    </LinearLayout>
 </RelativeLayout>

@@ -1,12 +1,17 @@
 package com.example.sabeena.tutorpal.views;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.TabHost;
+import android.support.v4.app.FragmentManager;
+import com.example.sabeena.tutorpal.Presenter.TabLayoutAdapter;
+import com.example.sabeena.tutorpal.Presenter.WeekviewLayoutAdapter;
 import com.example.sabeena.tutorpal.R;
 
 
@@ -19,6 +24,8 @@ import com.example.sabeena.tutorpal.R;
  * create an instance of this fragment.
  */
 public class WeekviewFragment extends Fragment {
+
+    TabHost tabHost;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -59,7 +66,38 @@ public class WeekviewFragment extends Fragment {
         // Inflate the layout for this fragment
         Integer total = mParam1*10;
         onButtonPressed(total.toString());
-        return inflater.inflate(R.layout.fragment_weekview, container, false);
+        View view= inflater.inflate(R.layout.fragment_weekview, container, false);
+
+        TabLayout tabLayout = (TabLayout)view.findViewById(R.id.tab_layout);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        tabLayout.addTab(tabLayout.newTab().setText("NEW"));
+
+        //replaceCurrentTab();
+        final ViewPager viewPager = (ViewPager)view. findViewById(R.id.pager);
+        WeekviewLayoutAdapter adapter = new WeekviewLayoutAdapter(getActivity().getSupportFragmentManager());
+
+
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -86,6 +124,7 @@ public class WeekviewFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
 
     /**
      * This interface must be implemented by activities that contain this

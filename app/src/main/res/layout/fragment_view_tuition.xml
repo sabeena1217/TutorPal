@@ -1,11 +1,10 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.sabeena.tutorpal.views.AddTuitionFragment">
+    tools:context="com.example.sabeena.tutorpal.views.ViewTuitionFragment">
 
     <!-- TODO: Update blank fragment layout -->
-
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,19 +15,22 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical">
+
             <Switch
-                android:id="@+id/switchTuition"
+                android:id="@+id/switch1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
+                android:layout_gravity="end"
                 android:layout_marginTop="20dp"
-                android:layout_gravity="end"/>
+                android:text="Notification" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-<!--<string name="numbers"><![CDATA[123456<fontcolor="#FF0000">789</font>]]</string>-->
+                <!--<string name="numbers"><![CDATA[123456<fontcolor="#FF0000">789</font>]]</string>-->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -41,8 +43,8 @@
                 <EditText
                     android:id="@+id/etSubject"
                     android:layout_width="0dp"
-                    android:layout_weight="3"
                     android:layout_height="wrap_content"
+                    android:layout_weight="3"
                     android:ems="10"
                     android:hint="Subject"
                     android:inputType="textPersonName" />
@@ -64,8 +66,8 @@
                 <EditText
                     android:id="@+id/etTutorName"
                     android:layout_width="0dp"
-                    android:layout_weight="3"
                     android:layout_height="wrap_content"
+                    android:layout_weight="3"
                     android:ems="10"
                     android:hint="Tutor's Name"
                     android:inputType="textPersonName" />
@@ -109,9 +111,9 @@
 
                 <EditText
                     android:id="@+id/etFee"
-                    android:layout_weight="3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="3"
                     android:ems="10"
                     android:hint="Fee"
                     android:inputType="number" />
@@ -133,8 +135,8 @@
                 <EditText
                     android:id="@+id/etVenue"
                     android:layout_width="0dp"
-                    android:layout_weight="3"
                     android:layout_height="wrap_content"
+                    android:layout_weight="3"
                     android:ems="10"
                     android:hint="Venue"
                     android:inputType="textPostalAddress" />
@@ -142,7 +144,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="10dp" />
+                android:layout_height="30dp" />
 
             <TextView
                 android:id="@+id/txtSelectDays"
@@ -158,7 +160,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="5dp" />
+                android:layout_height="30dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -194,143 +196,21 @@
                     android:focusable="false"
                     android:hint="to"
                     android:inputType="textPersonName" />
-                <!--
-                                <Button
-                                    android:id="@+id/startTime"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="from"
-                                    android:background="@color/cardview_light_background"/>
 
-                                <Button
-                                    android:id="@+id/endTime"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="to"
-                                    android:background="@color/cardview_light_background"/>
-
-                -->
-                <!--
-                <Spinner
-                    android:id="@+id/startTime"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <Spinner
-                    android:id="@+id/endTime"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-                    -->
 
             </LinearLayout>
-            <!--
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/txtMon"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="MON"
-                                android:textSize="16sp" />
-
-                            <TextView
-                                android:id="@+id/txtTue"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="TUE"
-                                android:textSize="16sp" />
-
-                            <TextView
-                                android:id="@+id/txtWed"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="WED"
-                                android:textSize="16sp" />
-
-                            <TextView
-                                android:id="@+id/txtThu"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="THU"
-                                android:textSize="16sp" />
-
-                            <TextView
-                                android:id="@+id/txtFri"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="FRI"
-                                android:textSize="16sp" />
-
-                            <TextView
-                                android:id="@+id/txtSat"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="SAT"
-                                android:textSize="16sp" />
-
-                            <TextView
-                                android:id="@+id/txtSun"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="SUN"
-                                android:textSize="16sp" />
-                        </LinearLayout>
-            -->
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="10dp" />
 
-            <LinearLayout
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal">
-
-
-                <!--to remove the tuition tab from the child-->
-                <Button
-                    android:id="@+id/btnQuit"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableStart="@drawable/ic_decline_child" />
-                <Button
-                    android:id="@+id/btnOK"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableStart="@drawable/ic_done_child" />
-                <!--
-                                <Button
-                                    android:id="@+id/btnCancel"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="CANCEL" />
-                -->
-            </LinearLayout>
-
-            <Space
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
                 android:layout_width="match_parent"
-                android:layout_height="20dp" />
+                android:layout_height="100dp" />
+
         </LinearLayout>
     </ScrollView>
 
 
-
-</RelativeLayout>
+</FrameLayout>
