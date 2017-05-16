@@ -1,18 +1,26 @@
 package com.example.sabeena.tutorpal.views;
 
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
+import android.icu.util.Calendar;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.support.v4.app.FragmentManager;
+
 import com.example.sabeena.tutorpal.Presenter.TabLayoutAdapter;
 import com.example.sabeena.tutorpal.Presenter.WeekviewLayoutAdapter;
 import com.example.sabeena.tutorpal.R;
+
+import java.text.SimpleDateFormat;
 
 
 /**
@@ -23,9 +31,13 @@ import com.example.sabeena.tutorpal.R;
  * Use the {@link WeekviewFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WeekviewFragment extends Fragment {
+public class WeekviewFragment extends Fragment implements dayOfTheWeekFragment.OnFragmentInteractionListener {
 
-    TabHost tabHost;
+    private ViewPager viewPager;
+    private WeekviewLayoutAdapter mAdapter;
+    private ActionBar actionBar;
+    // Tab titles
+    private String[] tabs = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -64,19 +76,26 @@ public class WeekviewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Integer total = mParam1*10;
-        onButtonPressed(total.toString());
-        View view= inflater.inflate(R.layout.fragment_weekview, container, false);
+        //Integer total = mParam1*10;
+        //onButtonPressed(total.toString());
+        View view = inflater.inflate(R.layout.fragment_weekview, container, false);
 
-        TabLayout tabLayout = (TabLayout)view.findViewById(R.id.tab_layout);
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        tabLayout.addTab(tabLayout.newTab().setText("NEW"));
+        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
 
-        //replaceCurrentTab();
-        final ViewPager viewPager = (ViewPager)view. findViewById(R.id.pager);
+        //SQLiteDatabase db = tutorPalDB.getReadableDatabase();
+        //Cursor tuitions = tutorPalDB.getAllTuition(db, receivedChildID);
+
+        tabLayout.addTab(tabLayout.newTab().setText("MONDAY"));
+        tabLayout.addTab(tabLayout.newTab().setText("TUESDAY"));
+        tabLayout.addTab(tabLayout.newTab().setText("WEDNESDAY"));
+        tabLayout.addTab(tabLayout.newTab().setText("THURSDAY"));
+        tabLayout.addTab(tabLayout.newTab().setText("FRIDAY"));
+        tabLayout.addTab(tabLayout.newTab().setText("SATURDAY"));
+        tabLayout.addTab(tabLayout.newTab().setText("SUNDAY"));
+
+        final ViewPager viewPager = (ViewPager) view.findViewById(R.id.pager);
         WeekviewLayoutAdapter adapter = new WeekviewLayoutAdapter(getActivity().getSupportFragmentManager());
-
 
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -97,6 +116,84 @@ public class WeekviewFragment extends Fragment {
             }
         });
 
+
+        Log.d("monday", String.valueOf(Calendar.MONDAY));
+        Log.d("tuesday", String.valueOf(Calendar.TUESDAY));
+        Log.d("sunday", String.valueOf(Calendar.SUNDAY));
+
+
+        final java.util.Calendar calendar = java.util.Calendar.getInstance();
+
+        Log.d("today", String.valueOf( calendar.getTime()));
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        Log.d("today", sdf.format(calendar.getTime()));
+
+        int tabNumber = 6;
+        if( sdf.format(calendar.getTime()).equals("Monday")){
+            tabNumber = 0;
+        }else if(sdf.format(calendar.getTime()).equals("Tuesday")){
+            tabNumber = 1;
+        }else if(sdf.format(calendar.getTime()).equals("Wednesday")){
+            tabNumber = 2;
+        }else if(sdf.format(calendar.getTime()).equals("Thursday")){
+            tabNumber = 3;
+        }else if(sdf.format(calendar.getTime()).equals("Friday")){
+            tabNumber = 4;
+        }else if(sdf.format(calendar.getTime()).equals("Saturday")){
+            tabNumber = 5;
+        }else if(sdf.format(calendar.getTime()).equals("Sunday")){
+            tabNumber = 6;
+        }
+        //Log.d("today tabNumber : ", String.valueOf(tabNumber));
+        //monday 2
+
+        switch (tabNumber) {
+            case 1:
+                viewPager.setCurrentItem(tabNumber);
+            case 2:
+                viewPager.setCurrentItem(tabNumber);
+            case 3:
+                viewPager.setCurrentItem(tabNumber);
+            case 4:
+                viewPager.setCurrentItem(tabNumber);
+            case 5:
+                viewPager.setCurrentItem(tabNumber);
+            case 6:
+                viewPager.setCurrentItem(tabNumber);
+            case 7:
+                viewPager.setCurrentItem(tabNumber);
+            default:
+                viewPager.setCurrentItem(tabNumber);
+
+        }
+
+        //replaceCurrentTab();
+       /* final ViewPager viewPager = (ViewPager)view. findViewById(R.id.pager);
+        WeekviewLayoutAdapter adapter = new WeekviewLayoutAdapter(getActivity().getSupportFragmentManager());
+
+
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+*/
         return view;
     }
 
@@ -123,6 +220,12 @@ public class WeekviewFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 
 

@@ -208,6 +208,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return result;
     }
 
+    public Cursor getTuitionsOForheDay(SQLiteDatabase db,String dayOfTheWeek){
+        Cursor result = db.rawQuery("select * from " + DAY_TABLE + " where dayOfTheWeek = " + dayOfTheWeek + ";", null);
+        //Cursor.getCount();
+        return result;
+    }
+//
+    public ArrayList<Integer> getAllTuitionOfTheDay(SQLiteDatabase db, String dayOfTheWeek) {
+        //Cursor result = db.rawQuery("select * from " + TUITION_TABLE + ";", null);
+        Cursor result = db.rawQuery("select * from " + DAY_TABLE + " where dayOfTheWeek =  '" + dayOfTheWeek + "';", null);
+        //Cursor.getCount();
+        ArrayList<Integer> tuitionIDs = new ArrayList<>();
+
+        result.moveToFirst();
+        do {
+            tuitionIDs.add(result.getInt(1));
+        } while (result.moveToNext());
+
+        return tuitionIDs;
+    }
+
     public Cursor getTuition(SQLiteDatabase db, int tuitionID) {
         //Cursor result = db.rawQuery("select * from " + TUITION_TABLE + ";", null);
         Cursor result = db.rawQuery("select * from " + TUITION_TABLE + " where tuitionID = " + tuitionID + ";", null);

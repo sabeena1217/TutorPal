@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.sabeena.tutorpal.Presenter.AlarmReceiver;
 import com.example.sabeena.tutorpal.Presenter.DatabaseHandler;
+import com.example.sabeena.tutorpal.Presenter.MyAdapter;
 import com.example.sabeena.tutorpal.Presenter.RingtonePlayingService;
 import com.example.sabeena.tutorpal.Presenter.TabLayoutAdapter;
 import com.example.sabeena.tutorpal.R;
@@ -43,11 +44,14 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
     int tabCount = 0;
     TabLayout tabLayout;
     ArrayList<TuitionClass> tuitionClasses = new ArrayList<TuitionClass>();
+    //MyAdapter myAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        //myAdapter = (MyAdapter) getIntent().getSerializableExtra("MyAdapter");
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_add_child);
         tutorPalDB = new DatabaseHandler(this);
         //tabHost = (FragmentTabHost)findViewById(R.id.tabHost);
@@ -149,7 +153,7 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
         });
     }
 
-    private void scheduleAlarm(Calendar cal, int childID, int tuitionID) {
+    private void scheduleStartAlarm(Calendar cal, int childID, int tuitionID, int startOrEnd) {
         Calendar calendar = cal;
         //field, value
         //calendar.set(Calendar.DAY_OF_WEEK, dayOfWeek);
@@ -164,17 +168,45 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
         }
 
         Intent intent = new Intent(this, AlarmReceiver.class);
-        intent.putExtra("ID_array", new int[]{childID, tuitionID});
-        //Log.d("ADD CHILD"+ Integer.toString(childID),"ADD CHILD"+ Integer.toString(childID));
+        int[] ID_array = new int[]{childID,tuitionID,startOrEnd};
+        intent.putExtra("ID_array", ID_array);
+        Log.d("Add schedule"+ ID_array[0],"Add schedule"+ ID_array[0]);
 
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
 //        Log.d("ADD CHILD NOT....", "ADD CHILD NOT....");
     }
 
+
+    private void scheduleEndAlarm(Calendar cal, int childID, int tuitionID, int startOrEnd) {
+        Calendar calendar = cal;
+        //field, value
+        //calendar.set(Calendar.DAY_OF_WEEK, dayOfWeek);
+        //calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        //calendar.set(Calendar.MINUTE, minute);
+
+        Toast.makeText(this, "alarm set on " + calendar.getTime(), Toast.LENGTH_LONG).show();
+        //check we aren't setting it in the past which would trigger it to fire instantly
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            //  Toast.makeText(getActivity(),calendar.getTimeInMillis() + " " + System.currentTimeMillis() , Toast.LENGTH_LONG).show();
+            calendar.add(Calendar.DAY_OF_YEAR, 7);
+        }
+
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        int[] ID_array = new int[]{childID,tuitionID,startOrEnd};
+        intent.putExtra("ID_array", ID_array);
+        Log.d("Add schedule"+ ID_array[0],"Add schedule"+ ID_array[0]);
+
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+//        Log.d("ADD CHILD NOT....", "ADD CHILD NOT....");
+    }
 
     public void cancelAlarm() {
         Intent i = new Intent(this, RingtonePlayingService.class);
@@ -213,13 +245,19 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
                                         Log.d("ADD CHILD NOT....", "ADD CHILD NOT....");
                                         break;
                                     }
-                                    scheduleAlarm(tuitionClasses.get(i).getStartTime(),tuitionClasses.get(i).getChildID(),tutorPalDB.getLastTuitionID());
+                                    scheduleStartAlarm(tuitionClasses.get(i).getStartTime(),tuitionClasses.get(i).getChildID(),tutorPalDB.getLastTuitionID(),0);
+                                    scheduleEndAlarm(tuitionClasses.get(i).getEndTime(),tuitionClasses.get(i).getChildID(),tutorPalDB.getLastTuitionID(),1);
                                     //Log.d("ADD CHILD", "ADD CHILD NOT....");
                                 }
                                 etName.setText(null);
                                 radioGenderGrp.clearCheck();
                                 Toast.makeText(AddChild.this, "You have just added a new child to the system! " + tuitionClasses.size(), Toast.LENGTH_LONG).show();
                                 //have to update the Dashboard fragment with an insertion of
+                                /*if(myAdapter == null) {
+                                    myAdapter = (MyAdapter) getIntent().getSerializableExtra("MyAdapter");
+                                    myAdapter.notifyDataSetChanged();
+Log.d("myAdapter null", "ADD CHILD NOT....");
+                                }*/
                                 finish();
                             } else {
                                 Toast.makeText(AddChild.this, "Error Occured!", Toast.LENGTH_LONG).show();

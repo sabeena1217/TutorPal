@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,15 +89,6 @@ public class DashboardFragment extends Fragment {
         // Log.d(TAG,mParam2);
         Integer total = mParam1 * 56;
         onButtonPressed(total.toString());
-        fab = (FloatingActionButton) view.findViewById(R.id.fab);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent int1 = new Intent(DashboardFragment.this.getActivity(), AddChild.class);
-                startActivity(int1);
-            }
-        });
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.dashboardRecyclerView);
 
@@ -127,7 +119,22 @@ public class DashboardFragment extends Fragment {
         } while (result.moveToNext());
         tutorPalDB.close();
         // specify an adapter (see also next example)
-        mRecyclerView.setAdapter(new MyAdapter(getActivity(), myChildren));
+        final MyAdapter adapter = new MyAdapter(getActivity(), myChildren);
+        mRecyclerView.setAdapter(adapter);
+
+        fab = (FloatingActionButton) view.findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent int1 = new Intent(DashboardFragment.this.getActivity(), AddChild.class);
+                Log.d("myAdapter null", adapter.toString());
+                //int1.putExtra("MyAdapter",adapter);
+                Log.d("Adapter ",adapter.toString());
+                startActivity(int1);
+            }
+        });
+
         return view;
     }
 

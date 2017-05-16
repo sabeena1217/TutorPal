@@ -205,9 +205,9 @@
                 android:layout_height="10dp" />
 
             <com.google.android.gms.maps.MapView
-                android:id="@+id/mapView"
+                android:id="@+id/mapview"
                 android:layout_width="match_parent"
-                android:layout_height="100dp" />
+                android:layout_height="400dp" />
 
         </LinearLayout>
     </ScrollView>

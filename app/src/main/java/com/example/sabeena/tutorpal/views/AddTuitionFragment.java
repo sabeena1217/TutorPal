@@ -27,9 +27,15 @@ import com.example.sabeena.tutorpal.Presenter.RingtonePlayingService;
 import com.example.sabeena.tutorpal.R;
 import com.example.sabeena.tutorpal.models.Day;
 import com.example.sabeena.tutorpal.models.TuitionClass;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import static android.app.Activity.RESULT_OK;
 
 public class AddTuitionFragment extends Fragment {
 
@@ -41,7 +47,9 @@ public class AddTuitionFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private int mParam1;//last childID
     private Switch tuitionSwitch;
-
+    Button btnPlacePicker;
+    private static int PLACE_PICKER_REQUEST = 1;
+    EditText etVenue;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -189,13 +197,35 @@ public class AddTuitionFragment extends Fragment {
         final EditText etTutorName = (EditText) view.findViewById(R.id.etTutorName);
         final EditText etTutorACNumber = (EditText) view.findViewById(R.id.etTutorACNumber);
         final EditText etFee = (EditText) view.findViewById(R.id.etFee);
-        final EditText etVenue = (EditText) view.findViewById(R.id.etVenue);
-
+        etVenue = (EditText) view.findViewById(R.id.etVenue);
+        etVenue.setFocusable(false);
         etStartTime = (EditText) view.findViewById(R.id.etStartTime);
         final Calendar startTime = showStartTimePickerDialog();
 
         etEndTime = (EditText) view.findViewById(R.id.etEndTime);
         final Calendar endTime = showEndTimePickerDialog();
+
+        btnPlacePicker = (Button) view.findViewById(R.id.btnPlacePicker);
+        btnPlacePicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+                try {
+                    startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
+                } catch (GooglePlayServicesRepairableException e) {
+                    System.out.println("sabeeeeeeeeee");
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    System.out.println("eeeeeeeeee");
+                    e.printStackTrace();
+                }
+            }
+
+
+
+        });
 
         Button btnOK = (Button) view.findViewById(R.id.btnOK);
         btnOK.setOnClickListener(new View.OnClickListener() {
@@ -212,6 +242,7 @@ public class AddTuitionFragment extends Fragment {
                     }
                     tuition.setTuitionFee(Double.parseDouble(etFee.getText().toString()));
                     tuition.setLocation(etVenue.getText().toString());
+
 
                     int dayOfWeek = 0;
                     Day.DayOfTheWeek selectedDay = Day.DayOfTheWeek.MONDAY;
@@ -265,12 +296,26 @@ public class AddTuitionFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, getActivity());
+                etVenue.setText(place.getName()+" "+place.getAddress());
+                //String toastMsg = String.format("Place: %s", );
+                //Toast.makeText(getActivity(), toastMsg, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(TuitionClass tuition) {
         if (mListener != null) {
             mListener.onFragmentInteraction(tuition);
         }
     }
+
+
 
     @Override
     public void onAttach(Context context) {

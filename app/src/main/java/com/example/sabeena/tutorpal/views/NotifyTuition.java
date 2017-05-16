@@ -36,7 +36,7 @@ public class NotifyTuition extends AppCompatActivity implements ViewTuitionFragm
         setContentView(R.layout.activity_view_child);
 
         tutorPalDB = new DatabaseHandler(this);
-        Log.d("ADD CHILD class"+ Integer.toString(ID_array[0]),"ADD CHILD"+ Integer.toString(ID_array[0]));
+        //Log.d("ADD CHILD class"+ Integer.toString(ID_array[0]),"ADD CHILD"+ Integer.toString(ID_array[0]));
         Child c = tutorPalDB.getChild(ID_array[0]);
         //Log.d("ADD CHILD class"+ Integer.toString(ID_array[0]),"ADD CHILD"+ Integer.toString(ID_array[0]));
         nameTxt=(TextView) findViewById(R.id.nameTxt);

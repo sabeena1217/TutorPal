@@ -1,27 +1,59 @@
 package com.example.sabeena.tutorpal.views;
 
+import android.Manifest;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.sabeena.tutorpal.Presenter.DatabaseHandler;
 import com.example.sabeena.tutorpal.R;
-import com.example.sabeena.tutorpal.models.Day;
-import com.example.sabeena.tutorpal.models.TuitionClass;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,7 +63,8 @@ import java.util.Calendar;
  * Use the {@link ViewTuitionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ViewTuitionFragment extends Fragment {
+public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
@@ -40,6 +73,18 @@ public class ViewTuitionFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private int mParam1;//last childID
     private static final String ARG_PARAM2 = "param2";
+    MapView mapView;
+    GoogleMap map;
+    LocationManager locationManager;
+    Marker marker;
+    double latitude;
+    double longitude;
+    EditText etVenue;
+
+    LocationRequest mLocationRequest;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
+    Marker mCurrLocationMarker;
 
     // TODO: Rename and change types of parameters
 
@@ -133,6 +178,10 @@ public class ViewTuitionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_tuition, container, false);
 
+        mapView = (MapView) view.findViewById(R.id.mapview);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this); //this is important
+
         final Spinner days_spinner = (Spinner) view.findViewById(R.id.spinnerDay);
 
         //create an ArrayAdapter using the string array and a default spinner layout
@@ -163,7 +212,7 @@ public class ViewTuitionFragment extends Fragment {
         final EditText etTutorName = (EditText) view.findViewById(R.id.etTutorName);
         final EditText etTutorACNumber = (EditText) view.findViewById(R.id.etTutorACNumber);
         final EditText etFee = (EditText) view.findViewById(R.id.etFee);
-        final EditText etVenue = (EditText) view.findViewById(R.id.etVenue);
+        etVenue = (EditText) view.findViewById(R.id.etVenue);
 
 
         etSubject.setFocusable(false);
@@ -282,6 +331,191 @@ public class ViewTuitionFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //mapView.onPause();
+
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+        //map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        map.getUiSettings().setZoomControlsEnabled(true);
+        // map.getUiSettings().setMyLocationButtonEnabled(true);
+//------
+
+
+
+        // mGoogleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
+        //Initialize Google Play Services
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(getContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                //Location Permission already granted
+                buildGoogleApiClient();
+                map.setMyLocationEnabled(true);
+            } else {
+                //Request Location Permission
+                checkLocationPermission();
+            }
+        } else {
+            buildGoogleApiClient();
+            map.setMyLocationEnabled(true);
+        }
+
+
+
+        //--------
+        //map.addMarker(new MarkerOptions().position(new LatLng(50,6)));
+        //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(50,6), 10));
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        if (mCurrLocationMarker != null) {
+            mCurrLocationMarker.remove();
+        }
+
+        //Place current location marker
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.title("Current Position");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+        mCurrLocationMarker = map.addMarker(markerOptions);
+
+        //move map camera
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+
+        String loc = etVenue.getText().toString();
+        Toast.makeText(getContext(),loc,Toast.LENGTH_SHORT).show();
+        List<Address> addressList = null;
+        if (location != null || !location.equals("")) {
+            Geocoder geocoder = new Geocoder(getContext());
+            try {
+                addressList = geocoder.getFromLocationName(loc, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Address address = addressList.get(0);
+            LatLng latLng1 = new LatLng(address.getLatitude(),address.getLongitude());
+            MarkerOptions markerOptions1 = new MarkerOptions();
+            markerOptions1.position(latLng1);
+            markerOptions1.title("Tuition");
+            markerOptions1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+            mCurrLocationMarker = map.addMarker(markerOptions1);
+
+            //move map camera
+            map.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
+
+        }
+
+    }
+
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Location Permission Needed")
+                        .setMessage("This app needs the Location permission, please accept to use location functionality")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Prompt the user once explanation has been shown
+                                ActivityCompat.requestPermissions(getActivity(),
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
+                            }
+                        })
+                        .create()
+                        .show();
+
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLocationRequest = new LocationRequest();
+        //mLocationRequest.setInterval(1000);
+        //mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        if (ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -296,4 +530,40 @@ public class ViewTuitionFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // location-related task you need to do.
+                    if (ContextCompat.checkSelfPermission(getContext(),
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+
+                        if (mGoogleApiClient == null) {
+                            buildGoogleApiClient();
+                        }
+                        map.setMyLocationEnabled(true);
+                    }
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
 }

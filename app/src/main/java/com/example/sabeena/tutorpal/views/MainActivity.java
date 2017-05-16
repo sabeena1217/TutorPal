@@ -2,6 +2,7 @@ package com.example.sabeena.tutorpal.views;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,7 +20,7 @@ import android.widget.Toast;
 import com.example.sabeena.tutorpal.R;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener , WeekviewFragment.OnFragmentInteractionListener, DashboardFragment.OnFragmentInteractionListener, DayviewFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener , WeekviewFragment.OnFragmentInteractionListener, DashboardFragment.OnFragmentInteractionListener, DayviewFragment.OnFragmentInteractionListener,dayOfTheWeekFragment.OnFragmentInteractionListener{
 
     FragmentManager fm = getSupportFragmentManager();
 
@@ -112,5 +113,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(String data) {
         Toast.makeText(this,data,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

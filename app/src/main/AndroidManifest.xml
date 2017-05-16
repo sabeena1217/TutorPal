@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.sabeena.tutorpal">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -29,6 +31,9 @@
         <service android:name=".Presenter.RingtonePlayingService" />
 
         <activity android:name=".views.NotifyTuition"></activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAYjW9nyWMorav5uoK0HbOyTZB2sBDYmgk" />
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import com.example.sabeena.tutorpal.models.Child;
 import com.example.sabeena.tutorpal.views.DashboardFragment;
 import com.example.sabeena.tutorpal.views.ViewChild;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  * Created by SaBeeNa on 3/30/2017.
  */
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.RecyclerVH> {
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.RecyclerVH>  implements Serializable{
 
     Context c;
     private ArrayList<Child> myChildren = new ArrayList<>();
@@ -35,7 +36,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.RecyclerVH> {
     // you provide access to all the views for a data item in a view holder
 
     //ViewHolder class
-    public static class RecyclerVH extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class RecyclerVH extends RecyclerView.ViewHolder implements View.OnClickListener, Serializable{
         // each data item is just a string in this case
         public TextView IDTxt;
         public TextView nameTxt;
