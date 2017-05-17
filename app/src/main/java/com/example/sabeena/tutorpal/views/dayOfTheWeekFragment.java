@@ -93,44 +93,47 @@ public class dayOfTheWeekFragment extends Fragment {
 
         for (int i = 0; i < tuitionIDs.size(); i++) {
             Cursor tuition = tutorPalDB.getTuition(db, tuitionIDs.get(i));
+            if (tuition.getCount() > 0) {
+                tuition.moveToFirst();
 
-            tuition.moveToFirst();
+                TuitionClass t = new TuitionClass(tuition.getInt(1));
+                t.setSubject(tuition.getString(2));
+                t.setTutorName(tuition.getString(3));
+                t.setTutorACNumber(tuition.getString(4));
+                t.setLocation(tuition.getString(5));
+                t.setTuitionFee(tuition.getDouble(6));
+                t.setLongitude(tuition.getString(7));
+                t.setLatitude(tuition.getString(8));
 
-            TuitionClass t = new TuitionClass(tuition.getInt(1));
-            t.setSubject(tuition.getString(2));
-            t.setTutorName(tuition.getString(3));
-            t.setTutorACNumber(tuition.getString(4));
-            t.setLocation(tuition.getString(5));
-            t.setTuitionFee(tuition.getDouble(6));
+                Day.DayOfTheWeek d = Day.DayOfTheWeek.MONDAY;
 
-            Day.DayOfTheWeek d = Day.DayOfTheWeek.MONDAY;
+                Cursor tuitionDays = tutorPalDB.getTuitionDay(db, tuition.getInt(0));//from the DAY_TABLE
+                tuitionDays.moveToFirst();
+                if (tuitionDays.getCount() != 0) {
 
-            Cursor tuitionDays = tutorPalDB.getTuitionDay(db, tuition.getInt(0));//from the DAY_TABLE
-            tuitionDays.moveToFirst();
-            if (tuitionDays.getCount() != 0) {
-
-                if (tuitionDays.getString(2).equals("Monday"))
-                    d = Day.DayOfTheWeek.MONDAY;
-                else if (tuitionDays.getString(2).equals("Tuesday"))
-                    d = Day.DayOfTheWeek.THURSDAY;
-                else if (tuitionDays.getString(2).equals("Wednesday"))
-                    d = Day.DayOfTheWeek.WEDNESDAY;
-                else if (tuitionDays.getString(2).equals("Thursday"))
-                    d = Day.DayOfTheWeek.THURSDAY;
-                else if (tuitionDays.getString(2).equals("Friday"))
-                    d = Day.DayOfTheWeek.FRIDAY;
-                else if (tuitionDays.getString(2).equals("Saturday"))
-                    d = Day.DayOfTheWeek.SATURDAY;
-                else if (tuitionDays.getString(2).equals("Sunday"))
-                    d = Day.DayOfTheWeek.SUNDAY;
+                    if (tuitionDays.getString(2).equals("Monday"))
+                        d = Day.DayOfTheWeek.MONDAY;
+                    else if (tuitionDays.getString(2).equals("Tuesday"))
+                        d = Day.DayOfTheWeek.THURSDAY;
+                    else if (tuitionDays.getString(2).equals("Wednesday"))
+                        d = Day.DayOfTheWeek.WEDNESDAY;
+                    else if (tuitionDays.getString(2).equals("Thursday"))
+                        d = Day.DayOfTheWeek.THURSDAY;
+                    else if (tuitionDays.getString(2).equals("Friday"))
+                        d = Day.DayOfTheWeek.FRIDAY;
+                    else if (tuitionDays.getString(2).equals("Saturday"))
+                        d = Day.DayOfTheWeek.SATURDAY;
+                    else if (tuitionDays.getString(2).equals("Sunday"))
+                        d = Day.DayOfTheWeek.SUNDAY;
+                }
+                Day day = new Day(d, tuitionDays.getString(3), tuitionDays.getString(3));
+                t.setDay(day);
+                tuitionsForTheDay.add(t);
             }
-            Day day = new Day(d, tuitionDays.getString(3), tuitionDays.getString(3));
-            t.setDay(day);
-            tuitionsForTheDay.add(t);
         }
         tutorPalDB.close();
         mRecyclerView.setAdapter(new dayOfTheWeekAdapter(getActivity(), tuitionsForTheDay));
-       Log.d(mParam1 , mParam1);
+        Log.d(mParam1, mParam1);
         return view;
     }
 

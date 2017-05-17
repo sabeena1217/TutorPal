@@ -1,5 +1,6 @@
 package com.example.sabeena.tutorpal.views;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -8,6 +9,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -21,7 +25,7 @@ import com.example.sabeena.tutorpal.R;
 import com.example.sabeena.tutorpal.models.Child;
 import com.example.sabeena.tutorpal.models.TuitionClass;
 
-public class ViewChild extends AppCompatActivity implements ViewTuitionFragment.OnFragmentInteractionListener{
+public class ViewChild extends AppCompatActivity implements ViewTuitionFragment.OnFragmentInteractionListener {
 
     int receivedChildID;
     DatabaseHandler tutorPalDB;
@@ -32,17 +36,29 @@ public class ViewChild extends AppCompatActivity implements ViewTuitionFragment.
     RadioButton radiobtnFemale;
     TabLayout tabLayout;
     ViewTuitionTabLayoutAdapter adapter;
+    Button editChild;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        receivedChildID = getIntent().getIntExtra("ID of the Child",0);
+        receivedChildID = getIntent().getIntExtra("ID of the Child", 0);
         setContentView(R.layout.activity_view_child);
+        editChild = (Button) findViewById(R.id.btnEditChild);
+        editChild.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent int1 = new Intent(ViewChild.this, EditChild.class);
+                int1.putExtra("ID of the Child",Integer.parseInt(Integer.toString(receivedChildID)));
+                startActivity(int1);
+
+            }
+        });
+
 
         tutorPalDB = new DatabaseHandler(this);
         Child c = tutorPalDB.getChild(receivedChildID);
 
-        nameTxt=(TextView) findViewById(R.id.nameTxt);
+        nameTxt = (TextView) findViewById(R.id.nameTxt);
         nameTxt.setText(c.getName());
         //nameTxt.setInputType(InputType.TYPE_NULL);
 
@@ -50,11 +66,11 @@ public class ViewChild extends AppCompatActivity implements ViewTuitionFragment.
         radiobtnFemale = (RadioButton) findViewById(R.id.radioBtnFemale);
         radiobtnMale = (RadioButton) findViewById(R.id.radioBtnMale);
 
-        if(c.getGender().equals(radiobtnFemale.getText())){
+        if (c.getGender().equals(radiobtnFemale.getText())) {
             radiobtnFemale.setChecked(true);
             radiobtnMale.setChecked(false);
             radiobtnMale.setEnabled(false);
-        }else if(c.getGender().equals(radiobtnMale.getText())){
+        } else if (c.getGender().equals(radiobtnMale.getText())) {
             radiobtnMale.setChecked(true);
             radiobtnFemale.setChecked(false);
             radiobtnFemale.setEnabled(false);
@@ -64,8 +80,8 @@ public class ViewChild extends AppCompatActivity implements ViewTuitionFragment.
         SQLiteDatabase db = tutorPalDB.getReadableDatabase();
         Cursor tuitions = tutorPalDB.getAllTuition(db, receivedChildID);
 
-        for(int i=0;i<tuitions.getCount();i++){
-            tabLayout.addTab(tabLayout.newTab().setText("CLASS "+ (i+1)));
+        for (int i = 0; i < tuitions.getCount(); i++) {
+            tabLayout.addTab(tabLayout.newTab().setText("CLASS " + (i + 1)));
 
         }
 
@@ -95,7 +111,7 @@ public class ViewChild extends AppCompatActivity implements ViewTuitionFragment.
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onFragmentInteraction(boolean alarmOff) {
 
     }
 }

@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by SaBeeNa on 5/11/2017.
@@ -54,7 +55,8 @@ public class RingtonePlayingService extends Service {
         stopService(i);
 
         i = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int)System.currentTimeMillis(), i, PendingIntent.FLAG_CANCEL_CURRENT);
+        Log.d("Add current"+ System.currentTimeMillis(),"Add schedule"+ "will see");
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);

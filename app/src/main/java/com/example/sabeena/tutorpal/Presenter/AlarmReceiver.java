@@ -54,11 +54,14 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (ID_array[2] == 0) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_event_white_24dp)
+                    .setAutoCancel(false)
                     .setContentTitle("TutorPal")
                     .setContentText("Tuition Start Alert!")
                     .setSubText(childName + " has " + subject + " now!\n Tap to cancel the ringtone")
                     //.setStyle(new NotificationCompat.BigTextStyle())
-                    .setPriority(NotificationCompat.PRIORITY_HIGH);
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setDefaults(Notification.DEFAULT_ALL);
+
 
 
             //intent.putExtra("ID of the Child",Integer.parseInt((String) IDTxt.getText()));

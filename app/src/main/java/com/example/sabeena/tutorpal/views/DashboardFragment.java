@@ -105,18 +105,19 @@ public class DashboardFragment extends Fragment {
         SQLiteDatabase db = tutorPalDB.getReadableDatabase();
 
         Cursor result = tutorPalDB.getAllChildren(db);
-
-        result.moveToFirst();
+        if (result.getCount() > 0){
+            result.moveToFirst();
         do {
             Child c = new Child(result.getString(1), result.getString(2));
             Cursor t = tutorPalDB.getAllTuition(db, result.getInt(0));
             //Cursor t = tutorPalDB.getAllTuition(db, result.getInt(0));
             //
             c.setNoOfClasses(t.getCount());
-             //c.setID(t.getCount());
+            //c.setID(t.getCount());
             c.setID(result.getInt(0));
             myChildren.add(c);
         } while (result.moveToNext());
+    }
         tutorPalDB.close();
         // specify an adapter (see also next example)
         final MyAdapter adapter = new MyAdapter(getActivity(), myChildren);

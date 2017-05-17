@@ -102,6 +102,14 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
+
+                <Button
+                    android:id="@+id/btnEditChild"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Edit Child" />
+
+                
             </LinearLayout>
         </LinearLayout>
 

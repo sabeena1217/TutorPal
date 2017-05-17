@@ -7,19 +7,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.sabeena.tutorpal.models.Child;
 import com.example.sabeena.tutorpal.models.Day;
 import com.example.sabeena.tutorpal.models.TuitionClass;
-import com.example.sabeena.tutorpal.views.AddTuitionFragment;
+import com.example.sabeena.tutorpal.views.EditTuitionFragment;
 import com.example.sabeena.tutorpal.views.ViewTuitionFragment;
 
 import java.util.ArrayList;
 
 /**
- * Created by SaBeeNa on 5/1/2017.
+ * Created by SaBeeNa on 5/17/2017.
  */
 
-public class ViewTuitionTabLayoutAdapter extends FragmentStatePagerAdapter {
+public class EditTuitionTabLayoutAdapter extends FragmentStatePagerAdapter{
+
+
     int childID;
     DatabaseHandler tutorPalDB;
     Context context;
@@ -27,7 +28,7 @@ public class ViewTuitionTabLayoutAdapter extends FragmentStatePagerAdapter {
     ArrayList<TuitionClass> tuitionsArrayList = new ArrayList<TuitionClass>();
 
 
-    public ViewTuitionTabLayoutAdapter(FragmentManager fm, int receivedChildID, Context context) {
+    public EditTuitionTabLayoutAdapter(FragmentManager fm, int receivedChildID, Context context) {
         super(fm);
         this.childID = receivedChildID;
         this.context = context;
@@ -80,7 +81,7 @@ public class ViewTuitionTabLayoutAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
 
         //ViewTuitionFragment tab1 = ViewTuitionFragment.newInstance(tuitionID);
-        ViewTuitionFragment tab1 = ViewTuitionFragment.newInstance(tuitionsArrayList.get(position).getTuitionID());
+        EditTuitionFragment tab1 = EditTuitionFragment.newInstance(tuitionsArrayList.get(position).getTuitionID());
 
         return tab1;
 

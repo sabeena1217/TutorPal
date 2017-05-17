@@ -14,17 +14,24 @@ import com.example.sabeena.tutorpal.views.AddChild;
 import com.example.sabeena.tutorpal.views.AddTuitionFragment;
 import com.example.sabeena.tutorpal.views.NewTuitionFragment;
 
+import java.util.ArrayList;
+
 public class TabLayoutAdapter extends FragmentStatePagerAdapter {
 
     int NumOfTabs=0;
     FragmentManager fm;
     int lastChildId;
+    private ArrayList<Fragment> tuitions;
 
-    public TabLayoutAdapter(FragmentManager fm, int NumOfTabs, int lastChildID) {
+    //public TabLayoutAdapter(FragmentManager fm, int NumOfTabs, int lastChildID) {
+    public TabLayoutAdapter(FragmentManager fm, ArrayList<Fragment> tuitions) {
         super(fm);
-        this.fm= fm;
-        this.NumOfTabs = NumOfTabs;
-        this.lastChildId = lastChildID;
+        this.tuitions = tuitions;
+
+        //this.fm= fm;
+        //this.NumOfTabs = NumOfTabs;
+        //this.lastChildId = lastChildID;
+
         //setFragments();
     }
 
@@ -49,24 +56,40 @@ public class TabLayoutAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        return tuitions.get(position);
+    }
 
+    @Override
+    public CharSequence getPageTitle(int position) {
+        String title = "";
         switch (position) {
-            case 0: //last tab
-                NewTuitionFragment tab3 = NewTuitionFragment.newInstance();
-                return tab3;
-            case -1: //last tab, this is not working
-                NewTuitionFragment tab1 = NewTuitionFragment.newInstance();
-                return tab1;
-            default:
-                int lastChildID=this.lastChildId;
-                AddTuitionFragment tab2 = AddTuitionFragment.newInstance(lastChildID);
-                return tab2;
-
+            case 0:
+                title = "NEW";    // this is from a template, i have to
+                break;             // return title dynamically
+            case 1:
+                title = "CLASS 1";
+                break;
+            case 2:
+                title = "CLASS 2";
+                break;
+            case 3:
+                title = "CLASS 3";
+                break;
+            case 4:
+                title = "CLASS 4";
+                break;
+            case 5:
+                title = "CLASS 5";
+                break;
+            case 6:
+                title = "CLASS 6";
+                break;
         }
+        return title;
     }
 
     @Override
     public int getCount() {
-        return NumOfTabs;
+        return tuitions.size();
     }
 }

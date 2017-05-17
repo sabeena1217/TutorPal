@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -43,8 +44,11 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
     TabLayoutAdapter adapter;
     int tabCount = 0;
     TabLayout tabLayout;
+    private ArrayList<Fragment> tuitions = new ArrayList<Fragment>();
     ArrayList<TuitionClass> tuitionClasses = new ArrayList<TuitionClass>();
     //MyAdapter myAdapter;
+    ViewPager viewPager;
+    int lastChildId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +77,7 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
 
         etName = (EditText) findViewById(R.id.etName);
         radioGenderGrp = (RadioGroup) findViewById(R.id.radioBtnGrp);
-
+        lastChildId = tutorPalDB.getLastChildID();
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
         //tabLayout.addTab(tabLayout.newTab().setText("Tab 2"));
@@ -94,32 +98,20 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
         // }
         // );
 
-        addTabItem();
-        btnDone = (Button) findViewById(R.id.btnDone);
-
-        addChild();
-
-        btnDecline = (Button) findViewById(R.id.btnDecline);
-        btnDecline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //Toast.makeText(AddChild.this, "You have just added a new child to the system!", Toast.LENGTH_LONG).show();
-                Toast.makeText(AddChild.this, Integer.toString(tutorPalDB.getLastChildID()), Toast.LENGTH_LONG).show();
-            }
-        });
+        //addTabItem();
 
 
-    }
+        //---------------------------
 
-    public void addTabItem() {
-//        tabLayout.addTab(tabLayout.newTab().setText("NEW"),tabLayout.getTabCount());
 
         tabLayout.addTab(tabLayout.newTab().setText("NEW"));
 
+        NewTuitionFragment tab3 = NewTuitionFragment.newInstance();
+        tuitions.add(tab3);
+
         //replaceCurrentTab();
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        adapter = new TabLayoutAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), tutorPalDB.getLastChildID());
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        adapter = new TabLayoutAdapter(getSupportFragmentManager(), tuitions);
         //adapter.addTabPage();
         //tab layout get changed here
 
@@ -151,6 +143,28 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
 
             }
         });
+
+        //---------------------------------
+        btnDone = (Button) findViewById(R.id.btnDone);
+
+        addChild();
+
+        btnDecline = (Button) findViewById(R.id.btnDecline);
+        btnDecline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //Toast.makeText(AddChild.this, "You have just added a new child to the system!", Toast.LENGTH_LONG).show();
+                Toast.makeText(AddChild.this, Integer.toString(tutorPalDB.getLastChildID()), Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+    }
+
+    public void addTabItem() {
+//        tabLayout.addTab(tabLayout.newTab().setText("NEW"),tabLayout.getTabCount());
+
     }
 
     private void scheduleStartAlarm(Calendar cal, int childID, int tuitionID, int startOrEnd) {
@@ -163,20 +177,22 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
         Toast.makeText(this, "alarm set on " + calendar.getTime(), Toast.LENGTH_LONG).show();
         //check we aren't setting it in the past which would trigger it to fire instantly
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
-        //  Toast.makeText(getActivity(),calendar.getTimeInMillis() + " " + System.currentTimeMillis() , Toast.LENGTH_LONG).show();
-        calendar.add(Calendar.DAY_OF_YEAR, 7);
+            //  Toast.makeText(getActivity(),calendar.getTimeInMillis() + " " + System.currentTimeMillis() , Toast.LENGTH_LONG).show();
+            calendar.add(Calendar.DAY_OF_YEAR, 7);
         }
 
         Intent intent = new Intent(this, AlarmReceiver.class);
-        int[] ID_array = new int[]{childID,tuitionID,startOrEnd};
+        int[] ID_array = new int[]{childID, tuitionID, startOrEnd};
         intent.putExtra("ID_array", ID_array);
-        Log.d("Add schedule"+ ID_array[0],"Add schedule"+ ID_array[0]);
+        Log.d("Add schedule" + ID_array[0], "Add schedule" + ID_array[0]);
+        Log.d("Add alarm" + calendar.getTimeInMillis(), "Add schedule" + ID_array[0]);
+        Log.d("Add current" + System.currentTimeMillis(), "Add schedule" + ID_array[0]);
 
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int) calendar.getTimeInMillis(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 60 * 15, pendingIntent);
 //        Log.d("ADD CHILD NOT....", "ADD CHILD NOT....");
     }
 
@@ -196,28 +212,37 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
         }
 
         Intent intent = new Intent(this, AlarmReceiver.class);
-        int[] ID_array = new int[]{childID,tuitionID,startOrEnd};
+        int[] ID_array = new int[]{childID, tuitionID, startOrEnd};
         intent.putExtra("ID_array", ID_array);
-        Log.d("Add schedule"+ ID_array[0],"Add schedule"+ ID_array[0]);
+        Log.d("Add schedule" + ID_array[0], "Add schedule" + ID_array[0]);
 
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int) calendar.getTimeInMillis(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
 //        Log.d("ADD CHILD NOT....", "ADD CHILD NOT....");
     }
 
-    public void cancelAlarm() {
+    public void cancelAlarmStartAlarm() {
         Intent i = new Intent(this, RingtonePlayingService.class);
         stopService(i);
 
         Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int) System.currentTimeMillis(), intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
     }
 
+    public void cancelAlarmEndAlarm() {
+        Intent i = new Intent(this, RingtonePlayingService.class);
+        stopService(i);
+
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int) System.currentTimeMillis(), intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+    }
 
     public void addChild() {
         btnDone.setOnClickListener(
@@ -239,14 +264,16 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
 
                             if (isInserted) {
                                 for (int i = 0; i < tuitionClasses.size(); i++) {
-                                    boolean isTuitionInserted =tutorPalDB.insertClass(tuitionClasses.get(i));
-                                    boolean isDayInserted =tutorPalDB.insertDay(tutorPalDB.getLastTuitionID(),tuitionClasses.get(i).getDay());
-                                    if (!isTuitionInserted | !isDayInserted){
+                                    boolean isTuitionInserted = tutorPalDB.insertClass(tuitionClasses.get(i));
+                                    boolean isDayInserted = tutorPalDB.insertDay(tutorPalDB.getLastTuitionID(), tuitionClasses.get(i).getDay());
+                                    if (!isTuitionInserted | !isDayInserted) {
                                         Log.d("ADD CHILD NOT....", "ADD CHILD NOT....");
                                         break;
                                     }
-                                    scheduleStartAlarm(tuitionClasses.get(i).getStartTime(),tuitionClasses.get(i).getChildID(),tutorPalDB.getLastTuitionID(),0);
-                                    scheduleEndAlarm(tuitionClasses.get(i).getEndTime(),tuitionClasses.get(i).getChildID(),tutorPalDB.getLastTuitionID(),1);
+                                    if (new Integer(tuitionClasses.get(i).isNotification()).equals(1)) {
+                                        scheduleStartAlarm(tuitionClasses.get(i).getStartTime(), tuitionClasses.get(i).getChildID(), tutorPalDB.getLastTuitionID(), 0);
+                                        scheduleEndAlarm(tuitionClasses.get(i).getEndTime(), tuitionClasses.get(i).getChildID(), tutorPalDB.getLastTuitionID(), 1);
+                                    }
                                     //Log.d("ADD CHILD", "ADD CHILD NOT....");
                                 }
                                 etName.setText(null);
@@ -322,15 +349,32 @@ Log.d("myAdapter null", "ADD CHILD NOT....");
     @Override
     public void onFragmentInteraction(Boolean clicked) {
         if (clicked) {
-            tabCount = +1;
-            addTabItem();
+            tabCount += 1;
+            tabLayout.addTab(tabLayout.newTab().setText("CLASS " + tabCount));
+            int lastChildID = this.lastChildId;
+            AddTuitionFragment tab2 = AddTuitionFragment.newInstance(lastChildID);
+            tuitions.add(tab2);
+            adapter = new TabLayoutAdapter(getSupportFragmentManager(), tuitions);
+            viewPager.setAdapter(adapter);
+
             //Toast.makeText(this, "will this work at least?", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onFragmentInteraction(TuitionClass tuition) {
-        tuitionClasses.add(tuition);
+//true to remove the fragment
+        if (tuition == null) {
+
+            //tuitions.remove();
+            //adapter = new TabLayoutAdapter(getSupportFragmentManager(), tuitions);
+            //viewPager.setAdapter(adapter);
+
+            Toast.makeText(AddChild.this, "Tuition Removed", Toast.LENGTH_LONG).show();
+        } else {
+            tuitionClasses.add(tuition);
+            Toast.makeText(AddChild.this, "noOfclasses " + tuitionClasses.size(), Toast.LENGTH_LONG).show();
+        }
         //Toast.makeText(AddChild.this, "noOfclasses "+tuitionClasses.size(), Toast.LENGTH_LONG).show();
     }
 }

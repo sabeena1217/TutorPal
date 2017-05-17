@@ -22,6 +22,33 @@ public class TuitionClass {
     private Double tuitionFee;
     private Calendar startTime;
     private Calendar endTime;
+    private String longitude;
+    private String latitude;
+    private int notification;
+
+    public int isNotification() {
+        return notification;
+    }
+
+    public void setNotification(int notification) {
+        this.notification = notification;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
 
     public Calendar getStartTime() {
         return startTime;

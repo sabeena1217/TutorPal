@@ -43,6 +43,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String TUTOR_AC_NUMBER = "tutorACNumber";
     public static final String VENUE = "venue";
     public static final String FEE = "fee";
+    public static final String LONGITUDE = "longitude";
+    public static final String LATITUDE = "latitude";
+    public static final String NOTIFICATION = "notification";
+
 
     //day column names
     //public static final String TUITION_ID = "name";
@@ -51,8 +55,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String START_TIME = "startTimr";
     public static final String END_TIME = "endTime";
 
+
     public DatabaseHandler(Context context) {
-        super(context, DATABASE_NAME, null, 2); //database will be created
+        super(context, DATABASE_NAME, null, 4); //database will be created
         Log.d("Database Operations", "Database Created....");
     }
 
@@ -68,6 +73,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        if (oldVersion < 5) {
+            db.execSQL("alter table " + TUITION_TABLE + " add column notification INTEGER;");//create the tuition table
+
+            Log.d("Database Operations", "Tables Deleted....");
+        }
+
+        if (oldVersion < 4) {
+            db.execSQL("alter table " + TUITION_TABLE + " add column longitude TEXT;");//create the tuition table
+            db.execSQL("alter table " + TUITION_TABLE + " add column latitude TEXT;");
+
+            //Log.d("Database Operations", "TUITION_TABLE Created....");
+            //db.execSQL("create table " + DAY_TABLE + " (dayID INTEGER PRIMARY KEY AUTOINCREMENT, tuitionID INTEGER,dayOfTheWeek TEXT, startTimr TEXT, endTime TEXT, FOREIGN KEY(tuitionID) REFERENCES tuition_table(tuitionID));");//create the studen table
+            Log.d("Database Operations", "Tables Deleted....");
+        }
+        if (oldVersion < 3) {
+            db.execSQL("delete from " + DAY_TABLE);//create the tuition table
+            db.execSQL("delete from " + TUITION_TABLE);
+            db.execSQL("delete from " + STUDENT_TABLE);
+            //Log.d("Database Operations", "TUITION_TABLE Created....");
+            //db.execSQL("create table " + DAY_TABLE + " (dayID INTEGER PRIMARY KEY AUTOINCREMENT, tuitionID INTEGER,dayOfTheWeek TEXT, startTimr TEXT, endTime TEXT, FOREIGN KEY(tuitionID) REFERENCES tuition_table(tuitionID));");//create the studen table
+            Log.d("Database Operations", "Tables Deleted....");
+        }
 
         if (oldVersion < 2) {
             db.execSQL("create table " + TUITION_TABLE + " (tuitionID INTEGER PRIMARY KEY AUTOINCREMENT, childID INTEGER, subject TEXT, tutorName TEXT, tutorACNumber TEXT , venue TEXT, fee REAL,FOREIGN KEY(childID) REFERENCES student_table(childID));");//create the tuition table
@@ -107,6 +135,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(TUTOR_AC_NUMBER, t.getTutorACNumber());
         contentValues.put(VENUE, t.getLocation());
         contentValues.put(FEE, t.getTuitionFee());
+        contentValues.put(LONGITUDE, t.getLongitude());
+        contentValues.put(LATITUDE, t.getLatitude());
+        contentValues.put(NOTIFICATION, t.isNotification());
 
 
         long result = db.insert(TUITION_TABLE, null, contentValues);
@@ -172,7 +203,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return 0;
     }
 
-    public int  getLastTuitionID() {
+    public int getLastTuitionID() {
         SQLiteDatabase db = getReadableDatabase();
 
         //returns the last index of the table
@@ -208,23 +239,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public Cursor getTuitionsOForheDay(SQLiteDatabase db,String dayOfTheWeek){
+    public Cursor getTuitionsOForheDay(SQLiteDatabase db, String dayOfTheWeek) {
         Cursor result = db.rawQuery("select * from " + DAY_TABLE + " where dayOfTheWeek = " + dayOfTheWeek + ";", null);
         //Cursor.getCount();
         return result;
     }
-//
+
+    //
     public ArrayList<Integer> getAllTuitionOfTheDay(SQLiteDatabase db, String dayOfTheWeek) {
         //Cursor result = db.rawQuery("select * from " + TUITION_TABLE + ";", null);
         Cursor result = db.rawQuery("select * from " + DAY_TABLE + " where dayOfTheWeek =  '" + dayOfTheWeek + "';", null);
         //Cursor.getCount();
         ArrayList<Integer> tuitionIDs = new ArrayList<>();
-
-        result.moveToFirst();
-        do {
-            tuitionIDs.add(result.getInt(1));
-        } while (result.moveToNext());
-
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                tuitionIDs.add(result.getInt(1));
+            } while (result.moveToNext());
+        }
         return tuitionIDs;
     }
 

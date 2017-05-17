@@ -9,12 +9,14 @@ import android.content.Intent;
 import android.media.Ringtone;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -50,6 +52,9 @@ public class AddTuitionFragment extends Fragment {
     Button btnPlacePicker;
     private static int PLACE_PICKER_REQUEST = 1;
     EditText etVenue;
+    double longitude;
+    double latitude;
+    Switch notificationSwitch;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -170,6 +175,21 @@ public class AddTuitionFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_tuition, container, false);
 
+
+        notificationSwitch = (Switch) view.findViewById(R.id.switchNotification);
+        notificationSwitch.setChecked(true);
+
+        notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    Toast.makeText(getContext(), "set off", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(getContext(), "set on", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         final Spinner days_spinner = (Spinner) view.findViewById(R.id.spinnerDay);
 
         //create an ArrayAdapter using the string array and a default spinner layout
@@ -224,7 +244,6 @@ public class AddTuitionFragment extends Fragment {
             }
 
 
-
         });
 
         Button btnOK = (Button) view.findViewById(R.id.btnOK);
@@ -242,7 +261,13 @@ public class AddTuitionFragment extends Fragment {
                     }
                     tuition.setTuitionFee(Double.parseDouble(etFee.getText().toString()));
                     tuition.setLocation(etVenue.getText().toString());
-
+                    tuition.setLongitude(Double.toString(longitude));
+                    tuition.setLatitude(Double.toString(latitude));
+                    if(notificationSwitch.isChecked()) {
+                        tuition.setNotification(1);
+                    }else{
+                        tuition.setNotification(0);
+                    }
 
                     int dayOfWeek = 0;
                     Day.DayOfTheWeek selectedDay = Day.DayOfTheWeek.MONDAY;
@@ -291,7 +316,15 @@ public class AddTuitionFragment extends Fragment {
 
             }
         });
-
+        Button btnQuit = (Button) view.findViewById(R.id.btnQuit);
+        btnQuit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onButtonPressed(null);
+                //FragmentManager fm = getFragmentManager();
+                //fm.findFragmentById()
+            }
+        });
 
         return view;
     }
@@ -301,7 +334,9 @@ public class AddTuitionFragment extends Fragment {
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, getActivity());
-                etVenue.setText(place.getName()+" "+place.getAddress());
+                etVenue.setText(place.getName() + " " + place.getAddress());
+                longitude = place.getLatLng().longitude;
+                latitude = place.getLatLng().latitude;
                 //String toastMsg = String.format("Place: %s", );
                 //Toast.makeText(getActivity(), toastMsg, Toast.LENGTH_LONG).show();
             }
@@ -314,7 +349,6 @@ public class AddTuitionFragment extends Fragment {
             mListener.onFragmentInteraction(tuition);
         }
     }
-
 
 
     @Override

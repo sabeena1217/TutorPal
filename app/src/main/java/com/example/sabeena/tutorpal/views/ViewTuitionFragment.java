@@ -1,6 +1,8 @@
 package com.example.sabeena.tutorpal.views;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,12 +32,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.sabeena.tutorpal.Presenter.AlarmReceiver;
 import com.example.sabeena.tutorpal.Presenter.DatabaseHandler;
+import com.example.sabeena.tutorpal.Presenter.RingtonePlayingService;
 import com.example.sabeena.tutorpal.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -49,7 +55,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
+import com.example.sabeena.tutorpal.Presenter.RingtonePlayingService;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -80,6 +86,8 @@ public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback,
     double latitude;
     double longitude;
     EditText etVenue;
+    Switch notificationSwitch;
+
 
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
@@ -171,12 +179,24 @@ public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback,
         });
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_tuition, container, false);
+
+        notificationSwitch = (Switch) view.findViewById(R.id.switchNotification);
+        notificationSwitch.setChecked(true);
+        notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    Toast.makeText(getContext(), "set off", Toast.LENGTH_SHORT).show();
+                    onButtonPressed(true);
+                    notificationSwitch.setClickable(false);
+                }
+            }
+        });
+
 
         mapView = (MapView) view.findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
@@ -231,6 +251,9 @@ public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback,
         etTutorACNumber.setText(tuition.getString(4));
         etVenue.setText(tuition.getString(5));
         etFee.setText(Double.toString(tuition.getDouble(6)));
+
+        longitude = Double.parseDouble(tuition.getString(7));
+        latitude = Double.parseDouble(tuition.getString(8));
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.days_array, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -308,9 +331,9 @@ public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback,
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed(boolean alarmOff) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onFragmentInteraction(alarmOff);
         }
     }
 
@@ -374,7 +397,6 @@ public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback,
 //------
 
 
-
         // mGoogleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
         //Initialize Google Play Services
@@ -393,7 +415,6 @@ public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback,
             buildGoogleApiClient();
             map.setMyLocationEnabled(true);
         }
-
 
 
         //--------
@@ -426,32 +447,19 @@ public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback,
         mCurrLocationMarker = map.addMarker(markerOptions);
 
         //move map camera
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
 
 
-        String loc = etVenue.getText().toString();
-        Toast.makeText(getContext(),loc,Toast.LENGTH_SHORT).show();
-        List<Address> addressList = null;
-        if (location != null || !location.equals("")) {
-            Geocoder geocoder = new Geocoder(getContext());
-            try {
-                addressList = geocoder.getFromLocationName(loc, 1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        LatLng latLng1 = new LatLng(latitude, longitude);
+        MarkerOptions markerOptions1 = new MarkerOptions();
+        markerOptions1.position(latLng1);
+        markerOptions1.title("Tuition");
+        markerOptions1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+        mCurrLocationMarker = map.addMarker(markerOptions1);
 
-            Address address = addressList.get(0);
-            LatLng latLng1 = new LatLng(address.getLatitude(),address.getLongitude());
-            MarkerOptions markerOptions1 = new MarkerOptions();
-            markerOptions1.position(latLng1);
-            markerOptions1.title("Tuition");
-            markerOptions1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-            mCurrLocationMarker = map.addMarker(markerOptions1);
+        //move map camera
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng1, 10));
 
-            //move map camera
-            map.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-
-        }
 
     }
 
@@ -528,7 +536,7 @@ public class ViewTuitionFragment extends Fragment implements OnMapReadyCallback,
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(boolean alarmOff);
     }
 
     @Override
