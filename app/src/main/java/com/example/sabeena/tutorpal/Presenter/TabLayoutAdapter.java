@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class TabLayoutAdapter extends FragmentStatePagerAdapter {
 
-    int NumOfTabs=0;
+    int NumOfTabs = 0;
     FragmentManager fm;
     int lastChildId;
     private ArrayList<Fragment> tuitions;
@@ -36,16 +36,16 @@ public class TabLayoutAdapter extends FragmentStatePagerAdapter {
     }
 
     //public void setFragments() {
-      //  //complete this next time
-        //if (NumOfTabs > 1) {
+    //  //complete this next time
+    //if (NumOfTabs > 1) {
 
 //        for (int i = 0;i<NumOfTabs-1;i++){
 
 
-  //          AddTuitionFragment add = AddTuitionFragment.newInstance(lastChildID);
+    //          AddTuitionFragment add = AddTuitionFragment.newInstance(lastChildID);
     //        fm.beginTransaction().replace(R.id.fragment_layout, add, add.getTag()).commit();
-      //  }
-        //}
+    //  }
+    //}
 
     //}
 

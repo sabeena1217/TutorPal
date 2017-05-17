@@ -44,10 +44,11 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
     TabLayoutAdapter adapter;
     int tabCount = 0;
     TabLayout tabLayout;
+    ViewPager viewPager;
     private ArrayList<Fragment> tuitions = new ArrayList<Fragment>();
     ArrayList<TuitionClass> tuitionClasses = new ArrayList<TuitionClass>();
     //MyAdapter myAdapter;
-    ViewPager viewPager;
+
     int lastChildId;
 
     @Override
@@ -107,6 +108,7 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
         tabLayout.addTab(tabLayout.newTab().setText("NEW"));
 
         NewTuitionFragment tab3 = NewTuitionFragment.newInstance();
+
         tuitions.add(tab3);
 
         //replaceCurrentTab();
@@ -267,7 +269,7 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
                                     boolean isTuitionInserted = tutorPalDB.insertClass(tuitionClasses.get(i));
                                     boolean isDayInserted = tutorPalDB.insertDay(tutorPalDB.getLastTuitionID(), tuitionClasses.get(i).getDay());
                                     if (!isTuitionInserted | !isDayInserted) {
-                                        Log.d("ADD CHILD NOT....", "ADD CHILD NOT....");
+                                        Log.d("ADD Tuition NOT....", "ADD CHILD NOT....");
                                         break;
                                     }
                                     if (new Integer(tuitionClasses.get(i).isNotification()).equals(1)) {

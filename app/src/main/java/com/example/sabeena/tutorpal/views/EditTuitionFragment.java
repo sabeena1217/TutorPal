@@ -2,6 +2,7 @@ package com.example.sabeena.tutorpal.views;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
@@ -23,16 +24,21 @@ import android.widget.Toast;
 
 import com.example.sabeena.tutorpal.Presenter.DatabaseHandler;
 import com.example.sabeena.tutorpal.R;
+import com.example.sabeena.tutorpal.models.Day;
+import com.example.sabeena.tutorpal.models.TuitionClass;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.Calendar;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,6 +71,8 @@ public class EditTuitionFragment extends Fragment {
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
+    Integer tuitionID;
+    Integer childID;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -74,6 +82,7 @@ public class EditTuitionFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private int mParam1;
+    private int mParam2;
 
 
     private OnFragmentInteractionListener mListener;
@@ -83,11 +92,12 @@ public class EditTuitionFragment extends Fragment {
     }
 
     // TODO: Rename and change types and number of parameters
-    public static EditTuitionFragment newInstance(int param1) {
+    public static EditTuitionFragment newInstance(int param1, int param2) {
 
         EditTuitionFragment fragment = new EditTuitionFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, param1);
+        args.putInt(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
 
@@ -98,9 +108,12 @@ public class EditTuitionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getInt(ARG_PARAM1);
+            mParam2 = getArguments().getInt(ARG_PARAM2);
         }
     }
-    public void showStartTimePickerDialog() {
+
+    public Calendar showStartTimePickerDialog() {
+        final Calendar calendar = Calendar.getInstance();
         etStartTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +129,8 @@ public class EditTuitionFragment extends Fragment {
                         String am_pm = "";
                         am_pm = (selectedHour < 12) ? "AM" : "PM";//12 hour clk
                         etStartTime.setText(selectedHour + ":" + selectedMinute);
+                        calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+                        calendar.set(Calendar.MINUTE, selectedMinute);
                     }
                 }, hour, minute, true);//Yes 12 hour time
                 mTimePicker.setTitle("Select Start Time");
@@ -124,9 +139,11 @@ public class EditTuitionFragment extends Fragment {
 
             }
         });
+        return calendar;
     }
 
-    public void showEndTimePickerDialog() {
+    public Calendar showEndTimePickerDialog() {
+        final Calendar calendar = Calendar.getInstance();
         etEndTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,16 +164,20 @@ public class EditTuitionFragment extends Fragment {
                         //SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
                         //String DateTime = sdf.format(selectedHour);
                         //datetime.set(Calendar.HOUR_OF_DAY,selectedHour);
+
                         etEndTime.setText(selectedHour + ":" + selectedMinute);
+                        calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+                        calendar.set(Calendar.MINUTE, selectedMinute);
                     }
                 }, hour, minute, true);//Yes 12 hour time
                 mTimePicker.setTitle("Select End Time");
                 //mTimePicker.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
                 mTimePicker.show();
-
             }
         });
+        return calendar;
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -185,12 +206,18 @@ public class EditTuitionFragment extends Fragment {
         days_spinner.setAdapter(adapter);
 
         etStartTime = (EditText) view.findViewById(R.id.etStartTime);
-        showStartTimePickerDialog();
+
 
         etEndTime = (EditText) view.findViewById(R.id.etEndTime);
-        showEndTimePickerDialog();
 
-        final Integer tuitionID = mParam1;
+
+        final Calendar startTime = showStartTimePickerDialog();
+
+
+        final Calendar endTime = showEndTimePickerDialog();
+
+        tuitionID = mParam1;
+        childID = mParam2;
 
         final EditText etSubject = (EditText) view.findViewById(R.id.etSubject);
         final EditText etTutorName = (EditText) view.findViewById(R.id.etTutorName);
@@ -218,60 +245,223 @@ public class EditTuitionFragment extends Fragment {
 
         });
 
-        DatabaseHandler tutorPalDB = new DatabaseHandler(this.getActivity());
+        final DatabaseHandler tutorPalDB = new DatabaseHandler(this.getActivity());
         SQLiteDatabase db = tutorPalDB.getReadableDatabase();
 
         Cursor tuition = tutorPalDB.getTuition(db, tuitionID);
-        tuition.moveToFirst();
-        etSubject.setText(tuition.getString(2));
-        etTutorName.setText(tuition.getString(3));
-        etTutorACNumber.setText(tuition.getString(4));
-        etVenue.setText(tuition.getString(5));
-        etFee.setText(Double.toString(tuition.getDouble(6)));
+        if (tuition.getCount() > 0) {
+            tuition.moveToFirst();
+            etSubject.setText(tuition.getString(2));
+            etTutorName.setText(tuition.getString(3));
+            etTutorACNumber.setText(tuition.getString(4));
+            etVenue.setText(tuition.getString(5));
+            etFee.setText(Double.toString(tuition.getDouble(6)));
 
-        longitude = Double.parseDouble(tuition.getString(7));
-        latitude = Double.parseDouble(tuition.getString(8));
+            longitude = Double.parseDouble(tuition.getString(7));
+            latitude = Double.parseDouble(tuition.getString(8));
 
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.days_array, android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        days_spinner.setAdapter(spinnerAdapter);
-
-
-        Cursor tuitionDays = tutorPalDB.getTuitionDay(db, tuition.getInt(0));
-        tuitionDays.moveToFirst();
-        if (tuitionDays.getCount() != 0) {
-
-            if (tuitionDays.getString(2).equals("Monday"))
-                days_spinner.setSelection(0);
-            else if (tuitionDays.getString(2).equals("Tuesday"))
-                days_spinner.setSelection(1);
-            else if (tuitionDays.getString(2).equals("Wednesday"))
-                days_spinner.setSelection(2);
-            else if (tuitionDays.getString(2).equals("Thursday"))
-                days_spinner.setSelection(3);
-            else if (tuitionDays.getString(2).equals("Friday"))
-                days_spinner.setSelection(4);
-            else if (tuitionDays.getString(2).equals("Saturday"))
-                days_spinner.setSelection(5);
-            else if (tuitionDays.getString(2).equals("Sunday"))
-                days_spinner.setSelection(6);
+            ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this.getActivity(), R.array.days_array, android.R.layout.simple_spinner_item);
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            days_spinner.setAdapter(spinnerAdapter);
 
 
-            etStartTime = (EditText) view.findViewById(R.id.etStartTime);
-            etStartTime.setText(tuitionDays.getString(3));
+            Cursor tuitionDays = tutorPalDB.getTuitionDay(db, tuition.getInt(0));
+            tuitionDays.moveToFirst();
+            if (tuitionDays.getCount() != 0) {
 
-            etEndTime = (EditText) view.findViewById(R.id.etEndTime);
-            etEndTime.setText(tuitionDays.getString(4));
+                if (tuitionDays.getString(2).equals("Monday"))
+                    days_spinner.setSelection(0);
+                else if (tuitionDays.getString(2).equals("Tuesday"))
+                    days_spinner.setSelection(1);
+                else if (tuitionDays.getString(2).equals("Wednesday"))
+                    days_spinner.setSelection(2);
+                else if (tuitionDays.getString(2).equals("Thursday"))
+                    days_spinner.setSelection(3);
+                else if (tuitionDays.getString(2).equals("Friday"))
+                    days_spinner.setSelection(4);
+                else if (tuitionDays.getString(2).equals("Saturday"))
+                    days_spinner.setSelection(5);
+                else if (tuitionDays.getString(2).equals("Sunday"))
+                    days_spinner.setSelection(6);
+
+
+                etStartTime = (EditText) view.findViewById(R.id.etStartTime);
+                etStartTime.setText(tuitionDays.getString(3));
+
+                etEndTime = (EditText) view.findViewById(R.id.etEndTime);
+                etEndTime.setText(tuitionDays.getString(4));
+            }
         }
+
+
+        //-------------------------------
+
+
+        Button btnOK = (Button) view.findViewById(R.id.btnOK);
+        btnOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (etSubject.getText().toString().length() > 0 && etFee.getText().toString().length() > 0 && etVenue.getText().toString().length() > 0) {
+                if (tutorPalDB.getLastTuitionID() >= tuitionID) {
+
+                        TuitionClass tuition = new TuitionClass(childID);
+                    tuition.setTuitionID(tuitionID);
+                        tuition.setSubject(etSubject.getText().toString());
+                        if (etTutorName.getText().toString().length() > 0) {
+                            tuition.setTutorName(etTutorName.getText().toString());
+                        }
+                        if (etTutorACNumber.getText().toString().length() > 0) {
+                            tuition.setTutorACNumber(etTutorACNumber.getText().toString());
+                        }
+                        tuition.setTuitionFee(Double.parseDouble(etFee.getText().toString()));
+                        tuition.setLocation(etVenue.getText().toString());
+                        tuition.setLongitude(Double.toString(longitude));
+                        tuition.setLatitude(Double.toString(latitude));
+                        if (notificationSwitch.isChecked()) {
+                            tuition.setNotification(1);
+                        } else {
+                            tuition.setNotification(0);
+                        }
+
+                        int dayOfWeek = 0;
+                        Day.DayOfTheWeek selectedDay = Day.DayOfTheWeek.MONDAY;
+                        if (days_spinner.getSelectedItem().toString().equals("Monday")) {
+                            selectedDay = Day.DayOfTheWeek.MONDAY;
+                            startTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                            endTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                        } else if (days_spinner.getSelectedItem().toString().equals("Tuesday")) {
+                            selectedDay = Day.DayOfTheWeek.TUESDAY;
+                            startTime.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                            endTime.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                        } else if (days_spinner.getSelectedItem().toString().equals("Wednesday")) {
+                            selectedDay = Day.DayOfTheWeek.WEDNESDAY;
+                            startTime.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                            endTime.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                        } else if (days_spinner.getSelectedItem().toString().equals("Thursday")) {
+                            selectedDay = Day.DayOfTheWeek.THURSDAY;
+                            startTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                            endTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                        } else if (days_spinner.getSelectedItem().toString().equals("Friday")) {
+                            selectedDay = Day.DayOfTheWeek.FRIDAY;
+                            startTime.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+                            endTime.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+                        } else if (days_spinner.getSelectedItem().toString().equals("Saturday")) {
+                            selectedDay = Day.DayOfTheWeek.SATURDAY;
+                            startTime.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                            endTime.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                        } else if (days_spinner.getSelectedItem().toString().equals("Sunday")) {
+                            selectedDay = Day.DayOfTheWeek.SUNDAY;
+                            startTime.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                            endTime.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                        }
+                        //days_spinner.getSelectedItem().toString(),etStartTime.getText().toString(),etEndTime.getText().toString()
+                        tuition.setDay(new Day(selectedDay, etStartTime.getText().toString(), etEndTime.getText().toString()));
+
+                        //SimpleDateFormat dfH = new SimpleDateFormat("HH");
+                        //SimpleDateFormat dfM = new SimpleDateFormat("mm");
+                        tuition.setStartTime(startTime);
+                        tuition.setEndTime(endTime);
+                        //String st = dfM.format(startTime.getTime());
+                        //scheduleAlarm(startTime, lastChildID + 1, );
+                        //scheduleAlarm(endTime);
+                        //Toast.makeText(getActivity(), "start time " + startTime.getTime(), Toast.LENGTH_LONG).show();
+                        onButtonPressed(tuition, 0);//update
+                    }else{
+
+                    TuitionClass tuition = new TuitionClass(childID);
+                    //tuition.setTuitionID(tuitionID);
+                    tuition.setSubject(etSubject.getText().toString());
+                    if (etTutorName.getText().toString().length() > 0) {
+                        tuition.setTutorName(etTutorName.getText().toString());
+                    }
+                    if (etTutorACNumber.getText().toString().length() > 0) {
+                        tuition.setTutorACNumber(etTutorACNumber.getText().toString());
+                    }
+                    tuition.setTuitionFee(Double.parseDouble(etFee.getText().toString()));
+                    tuition.setLocation(etVenue.getText().toString());
+                    tuition.setLongitude(Double.toString(longitude));
+                    tuition.setLatitude(Double.toString(latitude));
+                    if (notificationSwitch.isChecked()) {
+                        tuition.setNotification(1);
+                    } else {
+                        tuition.setNotification(0);
+                    }
+
+                    int dayOfWeek = 0;
+                    Day.DayOfTheWeek selectedDay = Day.DayOfTheWeek.MONDAY;
+                    if (days_spinner.getSelectedItem().toString().equals("Monday")) {
+                        selectedDay = Day.DayOfTheWeek.MONDAY;
+                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                    } else if (days_spinner.getSelectedItem().toString().equals("Tuesday")) {
+                        selectedDay = Day.DayOfTheWeek.TUESDAY;
+                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                    } else if (days_spinner.getSelectedItem().toString().equals("Wednesday")) {
+                        selectedDay = Day.DayOfTheWeek.WEDNESDAY;
+                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                    } else if (days_spinner.getSelectedItem().toString().equals("Thursday")) {
+                        selectedDay = Day.DayOfTheWeek.THURSDAY;
+                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                    } else if (days_spinner.getSelectedItem().toString().equals("Friday")) {
+                        selectedDay = Day.DayOfTheWeek.FRIDAY;
+                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+                    } else if (days_spinner.getSelectedItem().toString().equals("Saturday")) {
+                        selectedDay = Day.DayOfTheWeek.SATURDAY;
+                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                    } else if (days_spinner.getSelectedItem().toString().equals("Sunday")) {
+                        selectedDay = Day.DayOfTheWeek.SUNDAY;
+                        startTime.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                        endTime.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                    }
+                    //days_spinner.getSelectedItem().toString(),etStartTime.getText().toString(),etEndTime.getText().toString()
+                    tuition.setDay(new Day(selectedDay, etStartTime.getText().toString(), etEndTime.getText().toString()));
+
+                    //SimpleDateFormat dfH = new SimpleDateFormat("HH");
+                    //SimpleDateFormat dfM = new SimpleDateFormat("mm");
+                    tuition.setStartTime(startTime);
+                    tuition.setEndTime(endTime);
+                    //String st = dfM.format(startTime.getTime());
+                    //scheduleAlarm(startTime, lastChildID + 1, );
+                    //scheduleAlarm(endTime);
+                    //Toast.makeText(getActivity(), "start time " + startTime.getTime(), Toast.LENGTH_LONG).show();
+                    onButtonPressed(tuition, 1);//new class
+
+                }
+
+                }
+            }
+        });
+
+
+        //------------------------------------
 
 
         return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed(TuitionClass tuition1, int isUpdatedOrDeleted) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onFragmentInteraction(tuition1 , isUpdatedOrDeleted);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, getActivity());
+                etVenue.setText(place.getName() + " " + place.getAddress());
+                longitude = place.getLatLng().longitude;
+                latitude = place.getLatLng().latitude;
+                //String toastMsg = String.format("Place: %s", );
+                //Toast.makeText(getActivity(), toastMsg, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -304,6 +494,6 @@ public class EditTuitionFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(TuitionClass tuition, int isUpdatedOrDeleted);
     }
 }

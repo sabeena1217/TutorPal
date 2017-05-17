@@ -57,7 +57,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     public DatabaseHandler(Context context) {
-        super(context, DATABASE_NAME, null, 4); //database will be created
+        super(context, DATABASE_NAME, null, 5); //database will be created
         Log.d("Database Operations", "Database Created....");
     }
 
@@ -150,6 +150,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
     }
+
+
+    public boolean updateClass(TuitionClass t) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();//to pass the values to the database
+
+        //contentValues.put(CHILD_ID, t.getChildID());
+        contentValues.put(SUBJECT, t.getSubject());
+        contentValues.put(TUTOR_NAME, t.getTutorName());
+        contentValues.put(TUTOR_AC_NUMBER, t.getTutorACNumber());
+        contentValues.put(VENUE, t.getLocation());
+        contentValues.put(FEE, t.getTuitionFee());
+        contentValues.put(LONGITUDE, t.getLongitude());
+        contentValues.put(LATITUDE, t.getLatitude());
+        contentValues.put(NOTIFICATION, t.isNotification());
+
+        db.update(TUITION_TABLE, contentValues, TUITION_ID + " = " + t.getTuitionID() + ";", null);
+        long result = db.insert(TUITION_TABLE, null, contentValues);
+        //incase of an error, returns -1, else returns row id the newly inserted row
+
+        if (result == -1) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
 
     public boolean insertDay(int lastTuitionID, Day d) {
         SQLiteDatabase db = this.getWritableDatabase();

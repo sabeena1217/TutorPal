@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * Created by SaBeeNa on 5/17/2017.
  */
 
-public class EditTuitionTabLayoutAdapter extends FragmentStatePagerAdapter{
+public class EditTuitionTabLayoutAdapter extends FragmentStatePagerAdapter {
 
 
     int childID;
@@ -26,70 +26,60 @@ public class EditTuitionTabLayoutAdapter extends FragmentStatePagerAdapter{
     Context context;
 
     ArrayList<TuitionClass> tuitionsArrayList = new ArrayList<TuitionClass>();
+    private ArrayList<Fragment> tuitions = new ArrayList<Fragment>();
 
 
-    public EditTuitionTabLayoutAdapter(FragmentManager fm, int receivedChildID, Context context) {
+    public EditTuitionTabLayoutAdapter(FragmentManager fm, ArrayList<Fragment> tuitions) {
         super(fm);
-        this.childID = receivedChildID;
-        this.context = context;
-        DatabaseHandler tutorPalDB = new DatabaseHandler(context);
-        SQLiteDatabase db = tutorPalDB.getReadableDatabase();
-        Cursor tuitions = tutorPalDB.getAllTuition(db, receivedChildID);
-        tuitions.moveToFirst();
-        if (tuitions.getCount() != 0) {
-            do {
-                TuitionClass t = new TuitionClass(tuitions.getInt(1));
-                t.setTuitionID(tuitions.getInt(0));
-                t.setSubject(tuitions.getString(2));
-                t.setTutorName(tuitions.getString(3));
-                t.setTutorACNumber(tuitions.getString(4));
-                t.setLocation(tuitions.getString(5));
-                t.setTuitionFee(tuitions.getDouble(6));
-                t.setLongitude(tuitions.getString(7));
-                t.setLatitude(tuitions.getString(8));
+        this.tuitions = tuitions;
 
-                Cursor tuitionDays = tutorPalDB.getTuitionDay(db, t.getTuitionID());
-                tuitionDays.moveToFirst();
-                if (tuitionDays.getCount() != 0) {
-                    Day.DayOfTheWeek selectedDay = Day.DayOfTheWeek.MONDAY;
+        //this.fm= fm;
+        //this.NumOfTabs = NumOfTabs;
+        //this.lastChildId = lastChildID;
 
-                    if (tuitionDays.getString(2).equals("Monday"))
-                        selectedDay = Day.DayOfTheWeek.MONDAY;
-                    else if (tuitionDays.getString(2).equals("Tuesday"))
-                        selectedDay = Day.DayOfTheWeek.TUESDAY;
-                    else if (tuitionDays.getString(2).equals("Wednesday"))
-                        selectedDay = Day.DayOfTheWeek.WEDNESDAY;
-                    else if (tuitionDays.getString(2).equals("Thursday"))
-                        selectedDay = Day.DayOfTheWeek.THURSDAY;
-                    else if (tuitionDays.getString(2).equals("Friday"))
-                        selectedDay = Day.DayOfTheWeek.FRIDAY;
-                    else if (tuitionDays.getString(2).equals("Saturday"))
-                        selectedDay = Day.DayOfTheWeek.SATURDAY;
-                    else if (tuitionDays.getString(2).equals("Sunday"))
-                        selectedDay = Day.DayOfTheWeek.SUNDAY;
-
-                    t.setDay(new Day(selectedDay, tuitionDays.getString(3), tuitionDays.getString(4)));
-                }
-                tuitionsArrayList.add(t);
-            } while (tuitions.moveToNext());
-        }
-        tutorPalDB.close();
-
+        //setFragments();
     }
 
     @Override
     public Fragment getItem(int position) {
+        return tuitions.get(position);
+    }
 
-        //ViewTuitionFragment tab1 = ViewTuitionFragment.newInstance(tuitionID);
-        EditTuitionFragment tab1 = EditTuitionFragment.newInstance(tuitionsArrayList.get(position).getTuitionID());
+    public void addTabPage() {
 
-        return tab1;
+        notifyDataSetChanged();
+    }
 
-
+    public CharSequence getPageTitle(int position) {
+        String title = "";
+        switch (position) {
+            case 0:
+                title = "NEW";    // this is from a template, i have to
+                break;             // return title dynamically
+            case 1:
+                title = "CLASS 1";
+                break;
+            case 2:
+                title = "CLASS 2";
+                break;
+            case 3:
+                title = "CLASS 3";
+                break;
+            case 4:
+                title = "CLASS 4";
+                break;
+            case 5:
+                title = "CLASS 5";
+                break;
+            case 6:
+                title = "CLASS 6";
+                break;
+        }
+        return title;
     }
 
     @Override
     public int getCount() {
-        return tuitionsArrayList.size();
+        return tuitions.size();
     }
 }
