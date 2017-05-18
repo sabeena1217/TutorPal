@@ -188,13 +188,14 @@ public class AddChild extends AppCompatActivity implements AddTuitionFragment.On
         intent.putExtra("ID_array", ID_array);
         Log.d("Add schedule" + ID_array[0], "Add schedule" + ID_array[0]);
         Log.d("Add alarm" + calendar.getTimeInMillis(), "Add schedule" + ID_array[0]);
+        Log.d("Add alarm" + calendar.getTimeInMillis(), "Add schedule" + ID_array[0]);
         Log.d("Add current" + System.currentTimeMillis(), "Add schedule" + ID_array[0]);
 
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int) calendar.getTimeInMillis(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 60 * 15, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
 //        Log.d("ADD CHILD NOT....", "ADD CHILD NOT....");
     }
 
@@ -312,6 +313,8 @@ Log.d("myAdapter null", "ADD CHILD NOT....");
                             }else{
                                 Toast.makeText(AddChild.this,"Error Occured!",Toast.LENGTH_LONG).show();
                             }*/
+                        }else{
+                            showMessage("Invalid Inputs!","Enter Subject, Fee, Venue and the Day of the tuition class!");
                         }
                     }
                 }

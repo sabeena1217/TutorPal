@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:wallet="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,7 +8,8 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    tools:context="com.example.sabeena.tutorpal.views.ViewChild">
+    tools:context="com.example.sabeena.tutorpal.views.ViewChild"
+    android:background="@drawable/abcd">
 
 
     <LinearLayout
@@ -95,6 +97,7 @@
             </LinearLayout>
 
             <LinearLayout
+
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
@@ -108,7 +111,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Edit Child" />
-
+<!--
+                <fragment
+                    android:id="@+id/wallet_fragment"
+                    android:name="com.google.android.gms.wallet.fragment.SupportWalletFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    wallet:environment="test"
+                    wallet:fragmentMode="buyButton" />
+-->
                 
             </LinearLayout>
         </LinearLayout>

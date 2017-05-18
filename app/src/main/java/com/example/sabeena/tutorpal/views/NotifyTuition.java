@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.sabeena.tutorpal.Presenter.AlarmReceiver;
 import com.example.sabeena.tutorpal.Presenter.DatabaseHandler;
+import com.example.sabeena.tutorpal.Presenter.NotifyTuitionLayoutAdapter;
 import com.example.sabeena.tutorpal.Presenter.RingtonePlayingService;
 import com.example.sabeena.tutorpal.Presenter.ViewTuitionTabLayoutAdapter;
 import com.example.sabeena.tutorpal.R;
@@ -33,7 +34,7 @@ public class NotifyTuition extends AppCompatActivity implements ViewTuitionFragm
     RadioButton radiobtnMale;
     RadioButton radiobtnFemale;
     TabLayout tabLayout;
-    ViewTuitionTabLayoutAdapter adapter;
+    NotifyTuitionLayoutAdapter adapter;
     String longitude;
     String latitude;
 
@@ -85,7 +86,7 @@ public class NotifyTuition extends AppCompatActivity implements ViewTuitionFragm
         }
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        adapter = new ViewTuitionTabLayoutAdapter(getSupportFragmentManager(), ID_array[0], this);
+        adapter = new NotifyTuitionLayoutAdapter(getSupportFragmentManager(), ID_array[1], this);
 
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

@@ -255,6 +255,7 @@ public class EditTuitionFragment extends Fragment {
             etTutorName.setText(tuition.getString(3));
             etTutorACNumber.setText(tuition.getString(4));
             etVenue.setText(tuition.getString(5));
+            etVenue.setFocusable(false);
             etFee.setText(Double.toString(tuition.getDouble(6)));
 
             longitude = Double.parseDouble(tuition.getString(7));

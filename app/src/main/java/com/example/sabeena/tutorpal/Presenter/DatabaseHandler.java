@@ -67,45 +67,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("create table " + STUDENT_TABLE + " (childID INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, gender TEXT);");//create the studen table
         Log.d("Database Operations", "STUDENT_TABLE Created....");
         //db.execSQL("create table "+ STUDENT_TABLE + " (childID INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, gender TEXT);" );//create the studen table
-
+        db.execSQL("create table " + TUITION_TABLE + " (tuitionID INTEGER PRIMARY KEY AUTOINCREMENT, childID INTEGER, subject TEXT, tutorName TEXT, tutorACNumber TEXT , venue TEXT, fee REAL, longitude TEXT, latitude TEXT ,notification INTEGER);");//create the tuition table
+        Log.d("Database Operations", "TUITION_TABLE Created....");
+        db.execSQL("create table " + DAY_TABLE + " (dayID INTEGER PRIMARY KEY AUTOINCREMENT, tuitionID INTEGER,dayOfTheWeek TEXT, startTimr TEXT, endTime TEXT);");//create the studen table
+        Log.d("Database Operations", "Table Created....");
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        if (oldVersion < 5) {
-            db.execSQL("alter table " + TUITION_TABLE + " add column notification INTEGER;");//create the tuition table
 
-            Log.d("Database Operations", "Tables Deleted....");
-        }
-
-        if (oldVersion < 4) {
-            db.execSQL("alter table " + TUITION_TABLE + " add column longitude TEXT;");//create the tuition table
-            db.execSQL("alter table " + TUITION_TABLE + " add column latitude TEXT;");
-
-            //Log.d("Database Operations", "TUITION_TABLE Created....");
-            //db.execSQL("create table " + DAY_TABLE + " (dayID INTEGER PRIMARY KEY AUTOINCREMENT, tuitionID INTEGER,dayOfTheWeek TEXT, startTimr TEXT, endTime TEXT, FOREIGN KEY(tuitionID) REFERENCES tuition_table(tuitionID));");//create the studen table
-            Log.d("Database Operations", "Tables Deleted....");
-        }
-        if (oldVersion < 3) {
-            db.execSQL("delete from " + DAY_TABLE);//create the tuition table
-            db.execSQL("delete from " + TUITION_TABLE);
-            db.execSQL("delete from " + STUDENT_TABLE);
-            //Log.d("Database Operations", "TUITION_TABLE Created....");
-            //db.execSQL("create table " + DAY_TABLE + " (dayID INTEGER PRIMARY KEY AUTOINCREMENT, tuitionID INTEGER,dayOfTheWeek TEXT, startTimr TEXT, endTime TEXT, FOREIGN KEY(tuitionID) REFERENCES tuition_table(tuitionID));");//create the studen table
-            Log.d("Database Operations", "Tables Deleted....");
-        }
 
         if (oldVersion < 2) {
-            db.execSQL("create table " + TUITION_TABLE + " (tuitionID INTEGER PRIMARY KEY AUTOINCREMENT, childID INTEGER, subject TEXT, tutorName TEXT, tutorACNumber TEXT , venue TEXT, fee REAL,FOREIGN KEY(childID) REFERENCES student_table(childID));");//create the tuition table
-            Log.d("Database Operations", "TUITION_TABLE Created....");
-            db.execSQL("create table " + DAY_TABLE + " (dayID INTEGER PRIMARY KEY AUTOINCREMENT, tuitionID INTEGER,dayOfTheWeek TEXT, startTimr TEXT, endTime TEXT, FOREIGN KEY(tuitionID) REFERENCES tuition_table(tuitionID));");//create the studen table
-            Log.d("Database Operations", "Table Created....");
+
         }
-       /* db.execSQL("DROP TABLE IF EXISTS " + STUDENT_TABLE + ";");
-        db.execSQL("DROP TABLE IF EXISTS " + TUITION_TABLE + ";");
-        db.execSQL("DROP TABLE IF EXISTS " + DAY_TABLE + ";");*/
+
         Log.d("Database Operations", "Database Updated....");
 //        onCreate(db);
     }

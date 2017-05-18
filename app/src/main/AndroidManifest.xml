@@ -21,9 +21,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".views.AddChild" />
-        <activity android:name=".views.ViewChild" />
-
+        <activity android:name=".views.AddChild"
+            android:parentActivityName="com.example.sabeena.tutorpal.views.MainActivity"
+        />
+        <activity android:name=".views.ViewChild"
+            android:parentActivityName="com.example.sabeena.tutorpal.views.MainActivity"
+            />
+        <activity android:name=".views.EditChild"
+            android:parentActivityName="com.example.sabeena.tutorpal.views.ViewChild"
+            ></activity>
         <receiver
             android:name=".Presenter.AlarmReceiver"
             android:enabled="true"
@@ -37,7 +43,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAYjW9nyWMorav5uoK0HbOyTZB2sBDYmgk" />
 
-        <activity android:name=".views.EditChild"></activity>
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
     </application>
 
 </manifest>
